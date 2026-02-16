@@ -1,0 +1,28 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  font-family: 'Heebo', Arial, sans-serif;
+  direction: rtl;
+  background-color: #f8fafc;
+  color: #1e293b;
+}
+
+@layer components {
+  .btn-primary {
+    @apply bg-primary-600 text-white px-4 py-2 rounded-lg hover:bg-primary-700 transition-colors font-medium;
+  }
+  .btn-secondary {
+    @apply bg-gray-100 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-200 transition-colors font-medium;
+  }
+  .card {
+    @apply bg-white rounded-xl shadow-sm border border-gray-100 p-6;
+  }
+  .tag {
+    @apply inline-block bg-primary-50 text-primary-700 text-sm px-3 py-1 rounded-full;
+  }
+  .stage-badge {
+    @apply inline-flex items-center gap-1 text-sm font-medium px-3 py-1 rounded-full;
+  }
+}

@@ -1,0 +1,323 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  CITIZEN
+  MK
+  ADMIN
+}
+
+enum BillStatus {
+  ACTIVE
+  PASSED
+  REJECTED
+  WITHDRAWN
+}
+
+enum BillStage {
+  PROPOSED          // הוגשה
+  TABLED            // הונחה על שולחן הכנסת
+  COMMITTEE         // בוועדה
+  FIRST_READING     // קריאה ראשונה
+  COMMITTEE_REVIEW  // חזרה לוועדה
+  SECOND_READING    // קריאה שנייה
+  THIRD_READING     // קריאה שלישית
+  PASSED            // אושרה
+  REJECTED          // נדחתה
+}
+
+enum VoteType {
+  UPVOTE
+  DOWNVOTE
+}
+
+enum SuggestionStatus {
+  PENDING
+  REVIEWED
+  ACCEPTED
+  REJECTED
+}
+
+enum NotificationType {
+  NEW_BILL
+  BILL_STAGE_CHANGE
+  COMMENT_REPLY
+  BADGE_EARNED
+  SUGGESTION_RESPONSE
+}
+
+enum NewsletterFrequency {
+  DAILY
+  WEEKLY
+  MONTHLY
+  SESSION
+}
+
+model User {
+  id            String   @id @default(uuid())
+  email         String   @unique
+  googleId      String?  @unique @map("google_id")
+  name          String
+  avatarUrl     String?  @map("avatar_url")
+  role          UserRole @default(CITIZEN)
+  isVerified    Boolean  @default(false) @map("is_verified")
+  phoneVerified Boolean  @default(false) @map("phone_verified")
+
+  // Gamification
+  points Int @default(0)
+
+  // MK-specific
+  mkNumber    Int?     @unique @map("mk_number")
+  partyName   String?  @map("party_name")
+  isCurrentMk Boolean  @default(false) @map("is_current_mk")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  stars                  BillStar[]
+  suggestions            Suggestion[]
+  comments               Comment[]
+  commentVotes           CommentVote[]
+  suggestionVotes        SuggestionVote[]
+  notifications          Notification[]
+  userBadges             UserBadge[]
+  newsletterSubscription NewsletterSubscription?
+  activities             ActivityLog[]
+
+  @@map("users")
+}
+
+model Bill {
+  id             String     @id @default(uuid())
+  knessetBillId  String     @unique @map("knesset_bill_id")
+
+  // Core info
+  titleHe        String     @map("title_he")
+  titleEn        String?    @map("title_en")
+  proposerName   String?    @map("proposer_name")
+  proposerParty  String?    @map("proposer_party")
+
+  // Content
+  fullTextHe     String     @map("full_text_he") @db.Text
+  fullTextUrl    String?    @map("full_text_url")
+
+  // AI Summary
+  summaryHe          String?   @map("summary_he") @db.Text
+  summaryEn          String?   @map("summary_en") @db.Text
+  summaryGeneratedAt DateTime? @map("summary_generated_at")
+
+  // Legislation tracking
+  currentStage      BillStage  @default(PROPOSED) @map("current_stage")
+  submissionDate    DateTime?  @map("submission_date")
+  firstReadingDate  DateTime?  @map("first_reading_date")
+  secondReadingDate DateTime?  @map("second_reading_date")
+  thirdReadingDate  DateTime?  @map("third_reading_date")
+  passedDate        DateTime?  @map("passed_date")
+  status            BillStatus @default(ACTIVE)
+
+  // Categorization
+  categories Json @default("[]")
+  tags       Json @default("[]")
+
+  // Engagement metrics (denormalized for performance)
+  starCount    Int @default(0) @map("star_count")
+  viewCount    Int @default(0) @map("view_count")
+  commentCount Int @default(0) @map("comment_count")
+
+  // Metadata
+  knessetSession Int? @map("knesset_session")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  stars       BillStar[]
+  suggestions Suggestion[]
+  comments    Comment[]
+
+  @@index([currentStage])
+  @@index([status])
+  @@index([knessetSession])
+  @@map("bills")
+}
+
+model BillStar {
+  id     String @id @default(uuid())
+  userId String @map("user_id")
+  billId String @map("bill_id")
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  bill Bill @relation(fields: [billId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, billId])
+  @@index([billId])
+  @@map("bill_stars")
+}
+
+model Suggestion {
+  id     String @id @default(uuid())
+  billId String @map("bill_id")
+  userId String @map("user_id")
+
+  content            String   @db.Text
+  stageWhenSubmitted BillStage? @map("stage_when_submitted")
+
+  upvotes            Int              @default(0)
+  downvotes          Int              @default(0)
+  isOfficialResponse Boolean          @default(false) @map("is_official_response")
+  status             SuggestionStatus @default(PENDING)
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  user  User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  bill  Bill             @relation(fields: [billId], references: [id], onDelete: Cascade)
+  votes SuggestionVote[]
+
+  @@index([billId])
+  @@map("suggestions")
+}
+
+model SuggestionVote {
+  id           String @id @default(uuid())
+  suggestionId String @map("suggestion_id")
+  userId       String @map("user_id")
+  voteType     VoteType @map("vote_type")
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  suggestion Suggestion @relation(fields: [suggestionId], references: [id], onDelete: Cascade)
+  user       User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([suggestionId, userId])
+  @@map("suggestion_votes")
+}
+
+model Comment {
+  id       String  @id @default(uuid())
+  billId   String  @map("bill_id")
+  userId   String  @map("user_id")
+  parentId String? @map("parent_id")
+
+  content   String  @db.Text
+  isEdited  Boolean @default(false) @map("is_edited")
+  isDeleted Boolean @default(false) @map("is_deleted")
+  upvotes   Int     @default(0)
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  user    User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  bill    Bill          @relation(fields: [billId], references: [id], onDelete: Cascade)
+  parent  Comment?      @relation("CommentReplies", fields: [parentId], references: [id])
+  replies Comment[]     @relation("CommentReplies")
+  votes   CommentVote[]
+
+  @@index([billId])
+  @@map("comments")
+}
+
+model CommentVote {
+  id        String   @id @default(uuid())
+  commentId String   @map("comment_id")
+  userId    String   @map("user_id")
+  voteType  VoteType @map("vote_type")
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  comment Comment @relation(fields: [commentId], references: [id], onDelete: Cascade)
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([commentId, userId])
+  @@map("comment_votes")
+}
+
+model Notification {
+  id     String           @id @default(uuid())
+  userId String           @map("user_id")
+  type   NotificationType
+  title  String
+  message String?         @db.Text
+  link    String?
+  isRead  Boolean         @default(false) @map("is_read")
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, isRead])
+  @@map("notifications")
+}
+
+model Badge {
+  id              String @id @default(uuid())
+  nameHe          String @map("name_he")
+  nameEn          String? @map("name_en")
+  descriptionHe   String? @map("description_he") @db.Text
+  iconUrl         String? @map("icon_url")
+  requirementType String? @map("requirement_type")
+  requirementCount Int?   @map("requirement_count")
+  rarity          String  @default("common")
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  userBadges UserBadge[]
+
+  @@map("badges")
+}
+
+model UserBadge {
+  id      String @id @default(uuid())
+  userId  String @map("user_id")
+  badgeId String @map("badge_id")
+
+  earnedAt DateTime @default(now()) @map("earned_at")
+
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  badge Badge @relation(fields: [badgeId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, badgeId])
+  @@map("user_badges")
+}
+
+model NewsletterSubscription {
+  id         String              @id @default(uuid())
+  userId     String              @unique @map("user_id")
+  email      String
+  frequency  NewsletterFrequency @default(WEEKLY)
+  categories Json                @default("[]")
+  isActive   Boolean             @default(true) @map("is_active")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("newsletter_subscriptions")
+}
+
+model ActivityLog {
+  id         String  @id @default(uuid())
+  userId     String? @map("user_id")
+  actionType String  @map("action_type")
+  entityType String? @map("entity_type")
+  entityId   String? @map("entity_id")
+  metadata   Json    @default("{}")
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+  @@index([createdAt])
+  @@map("activity_log")
+}
