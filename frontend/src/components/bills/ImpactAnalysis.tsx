@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { FiTrendingUp, FiTrendingDown, FiUsers, FiMapPin, FiDollarSign, FiLeaf } from 'react-icons/fi';
+import { FiTrendingUp, FiTrendingDown, FiUsers, FiMapPin, FiDollarSign, FiSun } from 'react-icons/fi';
 
 interface ImpactScore {
   score: number;
@@ -105,7 +105,7 @@ export default function ImpactAnalysis({ data }: { data: string }) {
         <div className="space-y-4">
           <ScoreBar score={impact.economic.score} label="השפעה כלכלית" icon={<FiDollarSign size={16} />} />
           <ScoreBar score={impact.social.score} label="השפעה חברתית" icon={<FiUsers size={16} />} />
-          <ScoreBar score={impact.environmental.score} label="השפעה סביבתית" icon={<FiLeaf size={16} />} />
+          <ScoreBar score={impact.environmental.score} label="השפעה סביבתית" icon={<FiSun size={16} />} />
         </div>
       </div>
 
