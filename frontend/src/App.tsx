@@ -9,6 +9,7 @@ import LoginPage from './pages/LoginPage';
 import SearchPage from './pages/SearchPage';
 import LeaderboardPage from './pages/LeaderboardPage';
 import ProfilePage from './pages/ProfilePage';
+import AboutPage from './pages/AboutPage';
 import { useAuthStore } from './stores/authStore';
 
 export default function App() {
@@ -35,6 +36,7 @@ export default function App() {
           <Route path="/leaderboard" element={<LeaderboardPage />} />
           <Route path="/profile/:id" element={<ProfilePage />} />
           <Route path="/login" element={<LoginPage />} />
+          <Route path="/about" element={<AboutPage />} />
         </Route>
       </Routes>
     </>
