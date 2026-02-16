@@ -8,11 +8,12 @@ import StarButton from '../components/bills/StarButton';
 import BillStageTracker from '../components/bills/BillStageTracker';
 import CommentSection from '../components/comments/CommentSection';
 import SuggestionSection from '../components/suggestions/SuggestionSection';
+import ImpactAnalysis from '../components/bills/ImpactAnalysis';
 import { BILL_STAGE_LABELS, type Bill } from '../types';
 
 export default function BillDetailPage() {
   const { id } = useParams<{ id: string }>();
-  const [tab, setTab] = useState<'summary' | 'fulltext' | 'suggestions' | 'comments'>('summary');
+  const [tab, setTab] = useState<'summary' | 'impact' | 'fulltext' | 'suggestions' | 'comments'>('summary');
   const [copied, setCopied] = useState(false);
 
   const { data, isLoading, error } = useQuery({
@@ -121,6 +122,7 @@ export default function BillDetailPage() {
       <div className="flex border-b border-gray-200">
         {[
           { key: 'summary', label: 'תקציר AI' },
+          { key: 'impact', label: 'ניתוח השפעה' },
           { key: 'fulltext', label: 'טקסט מלא' },
           { key: 'suggestions', label: `הצעות לשיפור` },
           { key: 'comments', label: `תגובות (${bill.commentCount})` },
@@ -150,6 +152,19 @@ export default function BillDetailPage() {
             <div className="text-center py-8 text-gray-400">
               <p>תקציר עדיין לא נוצר להצעת חוק זו</p>
               <p className="text-sm mt-1">התקציר ייוצר אוטומטית בקרוב</p>
+            </div>
+          )}
+        </div>
+      )}
+
+      {tab === 'impact' && (
+        <div className="card">
+          {bill.impactAnalysisHe ? (
+            <ImpactAnalysis data={bill.impactAnalysisHe} />
+          ) : (
+            <div className="text-center py-8 text-gray-400">
+              <p>ניתוח השפעה עדיין לא נוצר להצעת חוק זו</p>
+              <p className="text-sm mt-1">הניתוח ייוצר אוטומטית בקרוב</p>
             </div>
           )}
         </div>

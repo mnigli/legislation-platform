@@ -113,6 +113,9 @@ model Bill {
   summaryEn          String?   @map("summary_en") @db.Text
   summaryGeneratedAt DateTime? @map("summary_generated_at")
 
+  // AI Impact Analysis (JSON string)
+  impactAnalysisHe String? @map("impact_analysis_he") @db.Text
+
   // Legislation tracking
   currentStage      BillStage  @default(PROPOSED) @map("current_stage")
   submissionDate    DateTime?  @map("submission_date")

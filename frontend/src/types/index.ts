@@ -29,6 +29,7 @@ export interface Bill {
   summaryHe: string | null;
   summaryEn?: string | null;
   summaryGeneratedAt?: string;
+  impactAnalysisHe?: string;
   currentStage: BillStage;
   submissionDate?: string;
   firstReadingDate?: string;
