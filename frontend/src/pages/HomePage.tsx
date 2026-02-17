@@ -77,47 +77,74 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Explainer Video */}
+      {/* How It Works - Visual Explainer */}
       <section className="max-w-7xl mx-auto px-4 py-16">
-        <div className="bg-gradient-to-bl from-slate-900 via-knesset-blue to-blue-900 rounded-3xl overflow-hidden shadow-2xl">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-0">
-            {/* Video */}
-            <div className="relative aspect-video lg:aspect-auto">
-              <iframe
-                src={EXPLAINER_VIDEO_URL}
-                className="w-full h-full min-h-[300px] lg:min-h-[400px]"
-                allow="autoplay; fullscreen"
-                allowFullScreen
-                title="חוקית - גיטהב של החקיקה"
-              />
+        <div className="text-center mb-12">
+          <h2 className="text-3xl md:text-4xl font-black text-gray-900 mb-3">
+            איך <span className="text-knesset-blue">חוקית</span> עובדת?
+          </h2>
+          <p className="text-lg text-gray-500 max-w-2xl mx-auto">
+            בדיוק כמו שגיטהב שינה את עולם התוכנה — חוקית משנה את הדרך שבה אזרחים מתחברים לחקיקה
+          </p>
+        </div>
+
+        {/* 3-step process */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
+          <div className="relative text-center group">
+            <div className="w-20 h-20 bg-gradient-to-bl from-blue-500 to-knesset-blue rounded-2xl flex items-center justify-center mx-auto mb-5 shadow-lg shadow-blue-200 group-hover:scale-110 transition-transform">
+              <span className="text-3xl">📜</span>
             </div>
-            {/* Text */}
-            <div className="p-8 lg:p-12 flex flex-col justify-center">
-              <div className="flex items-center gap-2 mb-4">
-                <div className="w-8 h-8 bg-knesset-gold/20 rounded-lg flex items-center justify-center">
-                  <FiPlay className="text-knesset-gold" size={16} />
-                </div>
-                <span className="text-knesset-gold font-bold text-sm tracking-wider uppercase">סרטון הסבר</span>
-              </div>
-              <h2 className="text-3xl lg:text-4xl font-black text-white mb-4 leading-tight">
-                מה זה <span className="text-knesset-gold">חוקית</span>?
-              </h2>
-              <p className="text-blue-200 text-lg leading-relaxed mb-6">
-                צפו בסרטון הקצר שמסביר איך הפלטפורמה שלנו הופכת את החקיקה הישראלית לנגישה, שקופה ומשתפת — בדיוק כמו שגיטהב עשה לעולם התוכנה.
-              </p>
-              <div className="flex flex-wrap gap-3">
-                <div className="bg-white/10 backdrop-blur-sm rounded-xl px-4 py-2 text-sm text-white/80">
-                  ⭐ דירוג הצעות חוק
-                </div>
-                <div className="bg-white/10 backdrop-blur-sm rounded-xl px-4 py-2 text-sm text-white/80">
-                  🤖 תקצירים בינה מלאכותית
-                </div>
-                <div className="bg-white/10 backdrop-blur-sm rounded-xl px-4 py-2 text-sm text-white/80">
-                  📊 דשבורדים בזמן אמת
-                </div>
-              </div>
+            <div className="absolute top-10 right-0 hidden md:block w-full h-0.5 bg-gradient-to-l from-transparent via-blue-200 to-transparent -z-10" />
+            <span className="inline-block bg-knesset-blue text-white text-xs font-bold px-3 py-1 rounded-full mb-3">שלב 1</span>
+            <h3 className="text-xl font-bold text-gray-900 mb-2">הצעות חוק אמיתיות</h3>
+            <p className="text-gray-500 text-sm leading-relaxed">
+              כל הצעות החוק מהכנסת מיובאות אוטומטית מה-API הרשמי ומתורגמות לשפה פשוטה באמצעות בינה מלאכותית
+            </p>
+          </div>
+
+          <div className="relative text-center group">
+            <div className="w-20 h-20 bg-gradient-to-bl from-amber-400 to-orange-500 rounded-2xl flex items-center justify-center mx-auto mb-5 shadow-lg shadow-amber-200 group-hover:scale-110 transition-transform">
+              <span className="text-3xl">⭐</span>
+            </div>
+            <span className="inline-block bg-amber-500 text-white text-xs font-bold px-3 py-1 rounded-full mb-3">שלב 2</span>
+            <h3 className="text-xl font-bold text-gray-900 mb-2">דרגו והגיבו</h3>
+            <p className="text-gray-500 text-sm leading-relaxed">
+              תנו כוכבים להצעות שחשובות לכם, כתבו תגובות והציעו שיפורים — בדיוק כמו Pull Request בגיטהב
+            </p>
+          </div>
+
+          <div className="relative text-center group">
+            <div className="w-20 h-20 bg-gradient-to-bl from-emerald-400 to-teal-600 rounded-2xl flex items-center justify-center mx-auto mb-5 shadow-lg shadow-emerald-200 group-hover:scale-110 transition-transform">
+              <span className="text-3xl">📊</span>
+            </div>
+            <span className="inline-block bg-emerald-600 text-white text-xs font-bold px-3 py-1 rounded-full mb-3">שלב 3</span>
+            <h3 className="text-xl font-bold text-gray-900 mb-2">עקבו אחרי הנתונים</h3>
+            <p className="text-gray-500 text-sm leading-relaxed">
+              דשבורדים מתקדמים מציגים בזמן אמת: שיאני חקיקה, זמני אישור, והשוואה בינלאומית
+            </p>
+          </div>
+        </div>
+
+        {/* Video CTA banner */}
+        <div className="bg-gradient-to-l from-knesset-blue via-blue-800 to-indigo-900 rounded-2xl p-8 flex flex-col md:flex-row items-center justify-between gap-6">
+          <div className="flex items-center gap-4">
+            <div className="w-14 h-14 bg-white/10 backdrop-blur-sm rounded-xl flex items-center justify-center flex-shrink-0">
+              <FiPlay className="text-knesset-gold" size={24} />
+            </div>
+            <div>
+              <h3 className="text-xl font-bold text-white">רוצים לראות את זה בפעולה?</h3>
+              <p className="text-blue-200 text-sm">צפו בסרטון ההסבר הקצר שלנו — דקה וחצי שישנו את הדרך שבה אתם חושבים על חקיקה</p>
             </div>
           </div>
+          <a
+            href={EXPLAINER_VIDEO_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="bg-knesset-gold text-knesset-blue px-8 py-3 rounded-xl font-bold text-lg hover:bg-yellow-400 transition-colors flex items-center gap-2 whitespace-nowrap flex-shrink-0"
+          >
+            <FiPlay size={18} />
+            צפו בסרטון
+          </a>
         </div>
       </section>
 
