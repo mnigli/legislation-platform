@@ -1,12 +1,51 @@
 import { useQuery } from '@tanstack/react-query';
+import { useMemo } from 'react';
 import { FiClock, FiAward, FiGlobe, FiTrendingUp, FiBarChart2, FiUsers } from 'react-icons/fi';
 import { api } from '../services/api';
-import { BILL_STAGE_LABELS } from '../types';
+
+// ==================== TYPES ====================
+
+interface Bill {
+  id: string;
+  currentStage: string;
+  status: string;
+  proposerName: string | null;
+  proposerParty: string | null;
+  starCount: number;
+  viewCount: number;
+  commentCount: number;
+  categories: string[];
+  submissionDate: string | null;
+  createdAt: string;
+}
+
+// ==================== STATIC DATA ====================
+
+const STAGE_TIMELINE = [
+  { stage: 'PROPOSED', label: 'הגשה', avgDays: 0, cumDays: 0 },
+  { stage: 'TABLED', label: 'הנחה על שולחן הכנסת', avgDays: 14, cumDays: 14 },
+  { stage: 'COMMITTEE', label: 'דיון בוועדה', avgDays: 45, cumDays: 59 },
+  { stage: 'FIRST_READING', label: 'קריאה ראשונה', avgDays: 30, cumDays: 89 },
+  { stage: 'COMMITTEE_REVIEW', label: 'חזרה לוועדה', avgDays: 60, cumDays: 149 },
+  { stage: 'SECOND_READING', label: 'קריאה שנייה', avgDays: 21, cumDays: 170 },
+  { stage: 'THIRD_READING', label: 'קריאה שלישית', avgDays: 1, cumDays: 171 },
+  { stage: 'PASSED', label: 'אישור סופי', avgDays: 7, cumDays: 178 },
+];
+
+const WORLD_COMPARISON = [
+  { country: 'ישראל', flag: '🇮🇱', billsPerYear: 350, passRate: 8.5, avgDaysToPass: 178, parliamentSize: 120, billsPerMember: 2.9, highlight: true },
+  { country: 'ארה"ב', flag: '🇺🇸', billsPerYear: 6000, passRate: 3.5, avgDaysToPass: 263, parliamentSize: 535, billsPerMember: 11.2, highlight: false },
+  { country: 'בריטניה', flag: '🇬🇧', billsPerYear: 200, passRate: 25.0, avgDaysToPass: 220, parliamentSize: 650, billsPerMember: 0.3, highlight: false },
+  { country: 'גרמניה', flag: '🇩🇪', billsPerYear: 500, passRate: 40.0, avgDaysToPass: 190, parliamentSize: 736, billsPerMember: 0.7, highlight: false },
+  { country: 'צרפת', flag: '🇫🇷', billsPerYear: 450, passRate: 15.0, avgDaysToPass: 240, parliamentSize: 577, billsPerMember: 0.8, highlight: false },
+  { country: 'יפן', flag: '🇯🇵', billsPerYear: 200, passRate: 80.0, avgDaysToPass: 90, parliamentSize: 713, billsPerMember: 0.3, highlight: false },
+  { country: 'קנדה', flag: '🇨🇦', billsPerYear: 300, passRate: 10.0, avgDaysToPass: 200, parliamentSize: 443, billsPerMember: 0.7, highlight: false },
+];
 
 // ==================== HELPER COMPONENTS ====================
 
 function AnimatedBar({ value, max, color, delay = 0 }: { value: number; max: number; color: string; delay?: number }) {
-  const pct = Math.round((value / max) * 100);
+  const pct = max > 0 ? Math.round((value / max) * 100) : 0;
   return (
     <div className="w-full bg-gray-100 rounded-full h-3 overflow-hidden">
       <div
@@ -34,22 +73,89 @@ function StatCard({ icon, label, value, sub, accent }: { icon: React.ReactNode; 
 
 function SectionHeader({ icon, title, subtitle }: { icon: React.ReactNode; title: string; subtitle: string }) {
   return (
-    <div className="mb-8">
+    <div className="mb-4">
       <div className="flex items-center gap-3 mb-2">
-        <div className="w-10 h-10 bg-knesset-blue rounded-xl flex items-center justify-center text-white">
+        <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center text-white">
           {icon}
         </div>
-        <h2 className="text-2xl font-extrabold text-gray-900">{title}</h2>
+        <h2 className="text-2xl font-extrabold text-white">{title}</h2>
       </div>
-      <p className="text-gray-500 mr-13">{subtitle}</p>
+      <p className="text-white/70 mr-13">{subtitle}</p>
     </div>
   );
 }
 
+// ==================== COMPUTE STATS FROM BILLS ====================
+
+function computeStats(bills: Bill[]) {
+  const stageDistribution: Record<string, number> = {};
+  const partyProposals: Record<string, number> = {};
+  const proposerCount: Record<string, { count: number; party: string | null }> = {};
+
+  let totalViews = 0;
+  let totalStars = 0;
+  let totalComments = 0;
+  let activeBills = 0;
+  let passedBills = 0;
+
+  for (const bill of bills) {
+    // Stage distribution
+    stageDistribution[bill.currentStage] = (stageDistribution[bill.currentStage] || 0) + 1;
+
+    // Aggregate counts
+    totalViews += bill.viewCount || 0;
+    totalStars += bill.starCount || 0;
+    totalComments += bill.commentCount || 0;
+    if (bill.status === 'ACTIVE') activeBills++;
+    if (bill.status === 'PASSED') passedBills++;
+
+    // Party proposals
+    if (bill.proposerParty) {
+      const partyName = bill.proposerParty.length > 25
+        ? bill.proposerParty.substring(0, 25) + '...'
+        : bill.proposerParty;
+      partyProposals[partyName] = (partyProposals[partyName] || 0) + 1;
+    }
+
+    // Proposer count
+    if (bill.proposerName) {
+      const firstName = bill.proposerName.split(',')[0].trim();
+      if (!proposerCount[firstName]) {
+        proposerCount[firstName] = { count: 0, party: bill.proposerParty };
+      }
+      proposerCount[firstName].count++;
+    }
+  }
+
+  const topProposers = Object.entries(proposerCount)
+    .sort((a, b) => b[1].count - a[1].count)
+    .slice(0, 10)
+    .map(([name, data]) => ({ name, count: data.count, party: data.party }));
+
+  const topParties: [string, number][] = Object.entries(partyProposals)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 8);
+
+  return {
+    overview: {
+      totalBills: bills.length,
+      activeBills,
+      passedBills,
+      totalViews,
+      totalStars,
+      totalComments,
+    },
+    stageDistribution,
+    topProposers,
+    topParties,
+  };
+}
+
 // ==================== DASHBOARD 1: LEGISLATION TIMELINE ====================
 
-function LegislationTimeline({ timeline, stageDistribution }: { timeline: any[]; stageDistribution: Record<string, number> }) {
-  const maxDays = timeline[timeline.length - 1]?.cumDays || 180;
+function LegislationTimeline({ stageDistribution }: { stageDistribution: Record<string, number> }) {
+  const timeline = STAGE_TIMELINE;
+  const maxDays = timeline[timeline.length - 1]?.cumDays || 178;
   const totalInPipeline = Object.values(stageDistribution).reduce((s: number, v) => s + (v as number), 0);
 
   return (
@@ -139,7 +245,7 @@ function LegislationTimeline({ timeline, stageDistribution }: { timeline: any[];
         {/* Insight box */}
         <div className="mt-6 bg-amber-50 border border-amber-200 rounded-xl p-4">
           <p className="text-sm text-amber-800">
-            <span className="font-bold">💡 תובנה:</span> השלב הארוך ביותר הוא חזרה לוועדה ({timeline.find(s => s.stage === 'COMMITTEE_REVIEW')?.avgDays} ימים) — שם מתנהלים הדיונים המהותיים על נוסח החוק הסופי.
+            <span className="font-bold">💡 תובנה:</span> השלב הארוך ביותר הוא חזרה לוועדה (60 ימים) — שם מתנהלים הדיונים המהותיים על נוסח החוק הסופי.
           </p>
         </div>
       </div>
@@ -149,7 +255,7 @@ function LegislationTimeline({ timeline, stageDistribution }: { timeline: any[];
 
 // ==================== DASHBOARD 2: LEGISLATION CHAMPIONS ====================
 
-function LegislationChampions({ topProposers, topParties }: { topProposers: any[]; topParties: [string, number][] }) {
+function LegislationChampions({ topProposers, topParties }: { topProposers: { name: string; count: number; party: string | null }[]; topParties: [string, number][] }) {
   const maxProposerCount = topProposers[0]?.count || 1;
   const maxPartyCount = topParties[0]?.[1] || 1;
 
@@ -169,6 +275,10 @@ function LegislationChampions({ topProposers, topParties }: { topProposers: any[
   }
 
   const medals = ['🥇', '🥈', '🥉'];
+
+  if (topProposers.length === 0) {
+    return null;
+  }
 
   return (
     <div className="bg-white rounded-3xl border border-gray-100 shadow-sm overflow-hidden">
@@ -215,44 +325,46 @@ function LegislationChampions({ topProposers, topParties }: { topProposers: any[
           </div>
 
           {/* Top Parties */}
-          <div>
-            <h3 className="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
-              <FiBarChart2 size={18} className="text-amber-500" />
-              מפלגות לפי הצעות חוק
-            </h3>
-            <div className="space-y-4">
-              {topParties.slice(0, 6).map(([party, count], i) => (
-                <div key={party}>
-                  <div className="flex items-center justify-between mb-1.5">
-                    <span className="text-sm font-bold text-gray-700 truncate max-w-[70%]">{party}</span>
-                    <span className="text-sm font-extrabold text-gray-900">{count}</span>
+          {topParties.length > 0 && (
+            <div>
+              <h3 className="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
+                <FiBarChart2 size={18} className="text-amber-500" />
+                מפלגות לפי הצעות חוק
+              </h3>
+              <div className="space-y-4">
+                {topParties.slice(0, 6).map(([party, count], i) => (
+                  <div key={party}>
+                    <div className="flex items-center justify-between mb-1.5">
+                      <span className="text-sm font-bold text-gray-700 truncate max-w-[70%]">{party}</span>
+                      <span className="text-sm font-extrabold text-gray-900">{count}</span>
+                    </div>
+                    <div className="w-full bg-gray-100 rounded-full h-4 overflow-hidden">
+                      <div
+                        className={`h-full rounded-full bg-gradient-to-l ${getPartyColor(party)} transition-all duration-1000 ease-out`}
+                        style={{
+                          width: `${Math.round((count / maxPartyCount) * 100)}%`,
+                          transitionDelay: `${i * 150}ms`,
+                        }}
+                      />
+                    </div>
                   </div>
-                  <div className="w-full bg-gray-100 rounded-full h-4 overflow-hidden">
-                    <div
-                      className={`h-full rounded-full bg-gradient-to-l ${getPartyColor(party)} transition-all duration-1000 ease-out`}
-                      style={{
-                        width: `${Math.round((count / maxPartyCount) * 100)}%`,
-                        transitionDelay: `${i * 150}ms`,
-                      }}
-                    />
-                  </div>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
-          </div>
+          )}
         </div>
 
         {/* Fun fact */}
-        <div className="mt-8 bg-violet-50 border border-violet-200 rounded-xl p-4">
-          <p className="text-sm text-violet-800">
-            <span className="font-bold">🏆 ידעתם?</span> חבר הכנסת הפורה ביותר, <strong>{topProposers[0]?.name}</strong>, הגיש{' '}
-            <strong>{topProposers[0]?.count} הצעות חוק</strong> — פי{' '}
-            {topProposers[0]?.count && topProposers[topProposers.length - 1]?.count
-              ? Math.round(topProposers[0].count / Math.max(1, topProposers[topProposers.length - 1].count))
-              : '?'}{' '}
-            יותר מחבר הכנסת הכי פחות פעיל ברשימה.
-          </p>
-        </div>
+        {topProposers.length >= 2 && (
+          <div className="mt-8 bg-violet-50 border border-violet-200 rounded-xl p-4">
+            <p className="text-sm text-violet-800">
+              <span className="font-bold">🏆 ידעתם?</span> חבר הכנסת הפורה ביותר, <strong>{topProposers[0]?.name}</strong>, הגיש{' '}
+              <strong>{topProposers[0]?.count} הצעות חוק</strong> — פי{' '}
+              {Math.round(topProposers[0].count / Math.max(1, topProposers[topProposers.length - 1].count))}{' '}
+              יותר מחבר הכנסת הכי פחות פעיל ברשימה.
+            </p>
+          </div>
+        )}
       </div>
     </div>
   );
@@ -260,7 +372,8 @@ function LegislationChampions({ topProposers, topParties }: { topProposers: any[
 
 // ==================== DASHBOARD 3: ISRAEL VS WORLD ====================
 
-function IsraelVsWorld({ data }: { data: any[] }) {
+function IsraelVsWorld() {
+  const data = WORLD_COMPARISON;
   const maxPassRate = Math.max(...data.map(d => d.passRate));
   const maxAvgDays = Math.max(...data.map(d => d.avgDaysToPass));
   const maxBillsPerMember = Math.max(...data.map(d => d.billsPerMember));
@@ -395,13 +508,19 @@ function IsraelVsWorld({ data }: { data: any[] }) {
 // ==================== MAIN DASHBOARD PAGE ====================
 
 export default function DashboardPage() {
-  const { data: statsRes, isLoading } = useQuery({
-    queryKey: ['dashboard', 'stats'],
-    queryFn: () => api.getDashboardStats(),
+  // Fetch ALL bills from the existing /bills endpoint (which works on Railway)
+  const { data: billsRes, isLoading, isError } = useQuery({
+    queryKey: ['dashboard', 'allBills'],
+    queryFn: () => api.getBills({ limit: '500', sort: 'newest' }),
     staleTime: 5 * 60 * 1000,
   });
 
-  const stats = statsRes?.data;
+  // Compute stats client-side from fetched bills
+  const stats = useMemo(() => {
+    const bills: Bill[] = billsRes?.data || [];
+    if (bills.length === 0) return null;
+    return computeStats(bills);
+  }, [billsRes]);
 
   if (isLoading) {
     return (
@@ -421,7 +540,7 @@ export default function DashboardPage() {
     );
   }
 
-  if (!stats) {
+  if (isError || !stats) {
     return (
       <div className="max-w-7xl mx-auto px-4 py-12 text-center">
         <p className="text-gray-500 text-lg">שגיאה בטעינת נתונים</p>
@@ -475,10 +594,7 @@ export default function DashboardPage() {
 
       {/* Dashboard 1: Timeline */}
       <div className="mb-10">
-        <LegislationTimeline
-          timeline={stats.stageTimeline}
-          stageDistribution={stats.stageDistribution}
-        />
+        <LegislationTimeline stageDistribution={stats.stageDistribution} />
       </div>
 
       {/* Dashboard 2: Champions */}
@@ -491,7 +607,7 @@ export default function DashboardPage() {
 
       {/* Dashboard 3: Israel vs World */}
       <div className="mb-10">
-        <IsraelVsWorld data={stats.worldComparison} />
+        <IsraelVsWorld />
       </div>
 
       {/* Footer note */}
