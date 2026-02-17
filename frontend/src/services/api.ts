@@ -164,6 +164,11 @@ class ApiClient {
   async previewKnessetBills(knessetNum: number = 25, count: number = 5) {
     return this.request<any>(`/knesset/preview?knessetNum=${knessetNum}&count=${count}`);
   }
+
+  // Dashboard
+  async getDashboardStats() {
+    return this.request<any>('/dashboard/stats');
+  }
 }
 
 export const api = new ApiClient();

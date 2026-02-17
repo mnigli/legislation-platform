@@ -1,6 +1,6 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { useState } from 'react';
-import { FiSearch, FiBell, FiMenu, FiX, FiLogOut, FiUser, FiStar, FiDownload } from 'react-icons/fi';
+import { FiSearch, FiBell, FiMenu, FiX, FiLogOut, FiUser, FiStar, FiDownload, FiBarChart2 } from 'react-icons/fi';
 import { useAuthStore } from '../../stores/authStore';
 
 export default function Header() {
@@ -45,6 +45,10 @@ export default function Header() {
           <nav className="hidden md:flex items-center gap-4">
             <Link to="/bills" className="hover:text-knesset-gold transition-colors">
               הצעות חוק
+            </Link>
+            <Link to="/dashboard" className="hover:text-knesset-gold transition-colors flex items-center gap-1">
+              <FiBarChart2 size={14} />
+              דשבורד
             </Link>
             <Link to="/leaderboard" className="hover:text-knesset-gold transition-colors">
               לוח מובילים
@@ -98,6 +102,7 @@ export default function Header() {
             </form>
             <div className="flex flex-col gap-3">
               <Link to="/bills" onClick={() => setMenuOpen(false)} className="hover:text-knesset-gold">הצעות חוק</Link>
+              <Link to="/dashboard" onClick={() => setMenuOpen(false)} className="hover:text-knesset-gold flex items-center gap-1"><FiBarChart2 size={14} /> דשבורד</Link>
               <Link to="/leaderboard" onClick={() => setMenuOpen(false)} className="hover:text-knesset-gold">לוח מובילים</Link>
               <Link to="/admin/import" onClick={() => setMenuOpen(false)} className="hover:text-knesset-gold flex items-center gap-1"><FiDownload size={14} /> ייבוא מהכנסת</Link>
               {user ? (

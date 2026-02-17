@@ -11,6 +11,7 @@ import LeaderboardPage from './pages/LeaderboardPage';
 import ProfilePage from './pages/ProfilePage';
 import AboutPage from './pages/AboutPage';
 import KnessetImportPage from './pages/KnessetImportPage';
+import DashboardPage from './pages/DashboardPage';
 import { useAuthStore } from './stores/authStore';
 
 export default function App() {
@@ -38,6 +39,7 @@ export default function App() {
           <Route path="/profile/:id" element={<ProfilePage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/about" element={<AboutPage />} />
+          <Route path="/dashboard" element={<DashboardPage />} />
           <Route path="/admin/import" element={<KnessetImportPage />} />
         </Route>
       </Routes>
