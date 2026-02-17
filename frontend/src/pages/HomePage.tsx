@@ -1,9 +1,11 @@
 import { useQuery } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
-import { FiTrendingUp, FiUsers, FiStar, FiArrowLeft, FiClock } from 'react-icons/fi';
+import { FiTrendingUp, FiUsers, FiStar, FiArrowLeft, FiClock, FiPlay } from 'react-icons/fi';
 import { api } from '../services/api';
 import BillCard from '../components/bills/BillCard';
 import type { Bill } from '../types';
+
+const EXPLAINER_VIDEO_URL = 'https://ai.invideo.io/ai-mcp-video?video=-github--cwdvfl';
 
 export default function HomePage() {
   // Use the existing /bills endpoint with newest sort - works on deployed backend
@@ -70,6 +72,50 @@ export default function HomePage() {
             <div>
               <p className="text-2xl font-bold">{totalComments || '...'}</p>
               <p className="text-gray-500 text-sm">תגובות והצעות</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Explainer Video */}
+      <section className="max-w-7xl mx-auto px-4 py-16">
+        <div className="bg-gradient-to-bl from-slate-900 via-knesset-blue to-blue-900 rounded-3xl overflow-hidden shadow-2xl">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-0">
+            {/* Video */}
+            <div className="relative aspect-video lg:aspect-auto">
+              <iframe
+                src={EXPLAINER_VIDEO_URL}
+                className="w-full h-full min-h-[300px] lg:min-h-[400px]"
+                allow="autoplay; fullscreen"
+                allowFullScreen
+                title="חוקית - גיטהב של החקיקה"
+              />
+            </div>
+            {/* Text */}
+            <div className="p-8 lg:p-12 flex flex-col justify-center">
+              <div className="flex items-center gap-2 mb-4">
+                <div className="w-8 h-8 bg-knesset-gold/20 rounded-lg flex items-center justify-center">
+                  <FiPlay className="text-knesset-gold" size={16} />
+                </div>
+                <span className="text-knesset-gold font-bold text-sm tracking-wider uppercase">סרטון הסבר</span>
+              </div>
+              <h2 className="text-3xl lg:text-4xl font-black text-white mb-4 leading-tight">
+                מה זה <span className="text-knesset-gold">חוקית</span>?
+              </h2>
+              <p className="text-blue-200 text-lg leading-relaxed mb-6">
+                צפו בסרטון הקצר שמסביר איך הפלטפורמה שלנו הופכת את החקיקה הישראלית לנגישה, שקופה ומשתפת — בדיוק כמו שגיטהב עשה לעולם התוכנה.
+              </p>
+              <div className="flex flex-wrap gap-3">
+                <div className="bg-white/10 backdrop-blur-sm rounded-xl px-4 py-2 text-sm text-white/80">
+                  ⭐ דירוג הצעות חוק
+                </div>
+                <div className="bg-white/10 backdrop-blur-sm rounded-xl px-4 py-2 text-sm text-white/80">
+                  🤖 תקצירים בינה מלאכותית
+                </div>
+                <div className="bg-white/10 backdrop-blur-sm rounded-xl px-4 py-2 text-sm text-white/80">
+                  📊 דשבורדים בזמן אמת
+                </div>
+              </div>
             </div>
           </div>
         </div>
