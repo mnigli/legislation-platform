@@ -6,18 +6,19 @@ import BillCard from '../components/bills/BillCard';
 import type { Bill } from '../types';
 
 export default function HomePage() {
-  const { data: latest, isLoading } = useQuery({
-    queryKey: ['bills', 'latest'],
-    queryFn: () => api.getLatestBills(),
+  // Use the existing /bills endpoint with newest sort - works on deployed backend
+  const { data: latestRes, isLoading } = useQuery({
+    queryKey: ['bills', 'homepage-latest'],
+    queryFn: () => api.getBills({ sort: 'newest', limit: '6' }),
   });
 
-  const { data: stats } = useQuery({
-    queryKey: ['bills', 'stats'],
-    queryFn: () => api.getBillStats(),
-  });
+  // Also get total count from pagination meta
+  const latestBills: Bill[] = latestRes?.data || [];
+  const totalBills = latestRes?.meta?.pagination?.total || 0;
 
-  const latestBills: Bill[] = latest?.data || [];
-  const billStats = stats?.data || { totalBills: 0, totalStars: 0, totalComments: 0 };
+  // Calculate stats from displayed bills + total
+  const totalStars = latestBills.reduce((sum: number, b: Bill) => sum + b.starCount, 0);
+  const totalComments = latestBills.reduce((sum: number, b: Bill) => sum + b.commentCount, 0);
 
   return (
     <div>
@@ -49,8 +50,8 @@ export default function HomePage() {
               <FiTrendingUp className="text-primary-600" size={24} />
             </div>
             <div>
-              <p className="text-2xl font-bold">{billStats.totalBills || '...'}</p>
-              <p className="text-gray-500 text-sm">הצעות חוק פעילות</p>
+              <p className="text-2xl font-bold">{totalBills || '...'}</p>
+              <p className="text-gray-500 text-sm">הצעות חוק במערכת</p>
             </div>
           </div>
           <div className="card flex items-center gap-4">
@@ -58,7 +59,7 @@ export default function HomePage() {
               <FiStar className="text-yellow-600" size={24} />
             </div>
             <div>
-              <p className="text-2xl font-bold">{billStats.totalStars || '...'}</p>
+              <p className="text-2xl font-bold">{totalStars || '...'}</p>
               <p className="text-gray-500 text-sm">דירוגים ניתנו</p>
             </div>
           </div>
@@ -67,7 +68,7 @@ export default function HomePage() {
               <FiUsers className="text-green-600" size={24} />
             </div>
             <div>
-              <p className="text-2xl font-bold">{billStats.totalComments || '...'}</p>
+              <p className="text-2xl font-bold">{totalComments || '...'}</p>
               <p className="text-gray-500 text-sm">תגובות והצעות</p>
             </div>
           </div>
@@ -97,7 +98,7 @@ export default function HomePage() {
           </div>
         ) : (
           <div className="grid grid-cols-1 gap-4">
-            {latestBills.slice(0, 6).map((bill: Bill) => (
+            {latestBills.map((bill: Bill) => (
               <BillCard key={bill.id} bill={bill} />
             ))}
           </div>
