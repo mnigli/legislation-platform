@@ -1,17 +1,23 @@
 import { useQuery } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
-import { FiTrendingUp, FiUsers, FiStar, FiArrowLeft } from 'react-icons/fi';
+import { FiTrendingUp, FiUsers, FiStar, FiArrowLeft, FiClock } from 'react-icons/fi';
 import { api } from '../services/api';
 import BillCard from '../components/bills/BillCard';
 import type { Bill } from '../types';
 
 export default function HomePage() {
-  const { data: trending, isLoading } = useQuery({
-    queryKey: ['bills', 'trending'],
-    queryFn: () => api.getTrendingBills(),
+  const { data: latest, isLoading } = useQuery({
+    queryKey: ['bills', 'latest'],
+    queryFn: () => api.getLatestBills(),
   });
 
-  const trendingBills: Bill[] = trending?.data || [];
+  const { data: stats } = useQuery({
+    queryKey: ['bills', 'stats'],
+    queryFn: () => api.getBillStats(),
+  });
+
+  const latestBills: Bill[] = latest?.data || [];
+  const billStats = stats?.data || { totalBills: 0, totalStars: 0, totalComments: 0 };
 
   return (
     <div>
@@ -43,7 +49,7 @@ export default function HomePage() {
               <FiTrendingUp className="text-primary-600" size={24} />
             </div>
             <div>
-              <p className="text-2xl font-bold">{trendingBills.length || '...'}</p>
+              <p className="text-2xl font-bold">{billStats.totalBills || '...'}</p>
               <p className="text-gray-500 text-sm">הצעות חוק פעילות</p>
             </div>
           </div>
@@ -52,9 +58,7 @@ export default function HomePage() {
               <FiStar className="text-yellow-600" size={24} />
             </div>
             <div>
-              <p className="text-2xl font-bold">
-                {trendingBills.reduce((sum: number, b: Bill) => sum + b.starCount, 0) || '...'}
-              </p>
+              <p className="text-2xl font-bold">{billStats.totalStars || '...'}</p>
               <p className="text-gray-500 text-sm">דירוגים ניתנו</p>
             </div>
           </div>
@@ -63,20 +67,18 @@ export default function HomePage() {
               <FiUsers className="text-green-600" size={24} />
             </div>
             <div>
-              <p className="text-2xl font-bold">
-                {trendingBills.reduce((sum: number, b: Bill) => sum + b.commentCount, 0) || '...'}
-              </p>
+              <p className="text-2xl font-bold">{billStats.totalComments || '...'}</p>
               <p className="text-gray-500 text-sm">תגובות והצעות</p>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Trending Bills */}
+      {/* Latest Bills */}
       <section className="max-w-7xl mx-auto px-4 py-12">
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-2xl font-bold flex items-center gap-2">
-            <FiTrendingUp className="text-primary-500" /> הצעות חוק מובילות
+            <FiClock className="text-primary-500" /> הצעות חוק אחרונות מהכנסת
           </h2>
           <Link to="/bills" className="text-primary-600 hover:text-primary-700 flex items-center gap-1 font-medium">
             כל ההצעות <FiArrowLeft size={16} />
@@ -95,7 +97,7 @@ export default function HomePage() {
           </div>
         ) : (
           <div className="grid grid-cols-1 gap-4">
-            {trendingBills.slice(0, 5).map((bill: Bill) => (
+            {latestBills.slice(0, 6).map((bill: Bill) => (
               <BillCard key={bill.id} bill={bill} />
             ))}
           </div>

@@ -61,6 +61,14 @@ class ApiClient {
     return this.request<any>('/bills/trending');
   }
 
+  async getLatestBills() {
+    return this.request<any>('/bills/latest');
+  }
+
+  async getBillStats() {
+    return this.request<any>('/bills/stats');
+  }
+
   async searchBills(q: string) {
     return this.request<any>(`/bills/search?q=${encodeURIComponent(q)}`);
   }

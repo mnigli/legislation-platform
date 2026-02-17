@@ -93,6 +93,42 @@ router.get('/trending', optionalAuth, async (_req: Request, res: Response) => {
   }
 });
 
+// GET /bills/latest - Latest bills (by creation date)
+router.get('/latest', optionalAuth, async (_req: Request, res: Response) => {
+  try {
+    const bills = await prisma.bill.findMany({
+      where: { status: 'ACTIVE' },
+      orderBy: { createdAt: 'desc' },
+      take: 10,
+    });
+    res.json({ success: true, data: bills });
+  } catch (error) {
+    res.status(500).json({ success: false, error: { code: 'INTERNAL_ERROR', message: 'שגיאה' } });
+  }
+});
+
+// GET /bills/stats - Overall statistics
+router.get('/stats', async (_req: Request, res: Response) => {
+  try {
+    const [totalBills, totalStars, totalComments] = await Promise.all([
+      prisma.bill.count({ where: { status: 'ACTIVE' } }),
+      prisma.bill.aggregate({ _sum: { starCount: true } }),
+      prisma.bill.aggregate({ _sum: { commentCount: true } }),
+    ]);
+
+    res.json({
+      success: true,
+      data: {
+        totalBills,
+        totalStars: totalStars._sum.starCount || 0,
+        totalComments: totalComments._sum.commentCount || 0,
+      },
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, error: { code: 'INTERNAL_ERROR', message: 'שגיאה' } });
+  }
+});
+
 // GET /bills/:id - Get single bill
 router.get('/:id', optionalAuth, async (req: Request, res: Response) => {
   try {
