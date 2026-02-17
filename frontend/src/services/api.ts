@@ -1,4 +1,4 @@
-const API_BASE = '/api/v1';
+const API_BASE = (import.meta.env.VITE_API_URL || '') + '/api/v1';
 
 class ApiClient {
   private token: string | null = null;
@@ -139,6 +139,22 @@ class ApiClient {
 
   async markAllNotificationsRead() {
     return this.request<any>('/notifications/read-all', { method: 'PUT' });
+  }
+
+  // Knesset scraper
+  async scrapeKnessetBills(params: { knessetNum?: number; count?: number; skip?: number; updateExisting?: boolean } = {}) {
+    return this.request<any>('/knesset/scrape', {
+      method: 'POST',
+      body: JSON.stringify(params),
+    });
+  }
+
+  async getKnessetBillCount(knessetNum: number = 25) {
+    return this.request<any>(`/knesset/count?knessetNum=${knessetNum}`);
+  }
+
+  async previewKnessetBills(knessetNum: number = 25, count: number = 5) {
+    return this.request<any>(`/knesset/preview?knessetNum=${knessetNum}&count=${count}`);
   }
 }
 

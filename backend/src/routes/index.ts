@@ -5,6 +5,7 @@ import suggestionsRoutes from './suggestions.routes';
 import commentsRoutes from './comments.routes';
 import usersRoutes from './users.routes';
 import notificationsRoutes from './notifications.routes';
+import knessetRoutes from './knesset.routes';
 
 const router = Router();
 
@@ -15,5 +16,6 @@ router.use('/comments', commentsRoutes);     // /comments/:id/vote
 router.use('/bills', commentsRoutes);        // /bills/:billId/comments
 router.use('/users', usersRoutes);
 router.use('/notifications', notificationsRoutes);
+router.use('/knesset', knessetRoutes);
 
 export default router;

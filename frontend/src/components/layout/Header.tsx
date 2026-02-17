@@ -1,6 +1,6 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { useState } from 'react';
-import { FiSearch, FiBell, FiMenu, FiX, FiLogOut, FiUser, FiStar } from 'react-icons/fi';
+import { FiSearch, FiBell, FiMenu, FiX, FiLogOut, FiUser, FiStar, FiDownload } from 'react-icons/fi';
 import { useAuthStore } from '../../stores/authStore';
 
 export default function Header() {
@@ -49,6 +49,10 @@ export default function Header() {
             <Link to="/leaderboard" className="hover:text-knesset-gold transition-colors">
               לוח מובילים
             </Link>
+            <Link to="/admin/import" className="hover:text-knesset-gold transition-colors flex items-center gap-1">
+              <FiDownload size={14} />
+              ייבוא
+            </Link>
 
             {user ? (
               <div className="flex items-center gap-3">
@@ -95,6 +99,7 @@ export default function Header() {
             <div className="flex flex-col gap-3">
               <Link to="/bills" onClick={() => setMenuOpen(false)} className="hover:text-knesset-gold">הצעות חוק</Link>
               <Link to="/leaderboard" onClick={() => setMenuOpen(false)} className="hover:text-knesset-gold">לוח מובילים</Link>
+              <Link to="/admin/import" onClick={() => setMenuOpen(false)} className="hover:text-knesset-gold flex items-center gap-1"><FiDownload size={14} /> ייבוא מהכנסת</Link>
               {user ? (
                 <>
                   <Link to={`/profile/${user.id}`} onClick={() => setMenuOpen(false)} className="hover:text-knesset-gold">הפרופיל שלי</Link>

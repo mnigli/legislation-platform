@@ -10,7 +10,10 @@ const app = express();
 
 // Middleware
 app.use(helmet());
-app.use(cors({ origin: config.frontendUrl, credentials: true }));
+app.use(cors({
+  origin: config.frontendUrl ? config.frontendUrl.split(',') : '*',
+  credentials: true,
+}));
 app.use(express.json({ limit: '10mb' }));
 app.use(morgan('dev'));
 
