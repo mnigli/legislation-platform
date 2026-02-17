@@ -4,6 +4,7 @@ import { authenticateToken, optionalAuth, requireRole } from '../middleware/auth
 import { validate } from '../middleware/validation';
 import { z } from 'zod';
 import { Prisma } from '@prisma/client';
+import { generateBillSummary } from '../services/ai/summarizer';
 
 const router = Router();
 
@@ -235,6 +236,37 @@ router.get('/search', optionalAuth, async (req: Request, res: Response) => {
     res.json({ success: true, data: bills });
   } catch (error) {
     res.status(500).json({ success: false, error: { code: 'INTERNAL_ERROR', message: 'שגיאה בחיפוש' } });
+  }
+});
+
+// POST /bills/:id/summarize - Generate AI summary for a bill
+router.post('/:id/summarize', async (req: Request, res: Response) => {
+  try {
+    const billId = req.params.id as string;
+
+    const bill = await prisma.bill.findUnique({ where: { id: billId } });
+    if (!bill) {
+      res.status(404).json({ success: false, error: { code: 'NOT_FOUND', message: 'הצעת חוק לא נמצאה' } });
+      return;
+    }
+
+    console.log(`Generating AI summary for bill: ${bill.titleHe}`);
+    const summary = await generateBillSummary(billId);
+
+    res.json({
+      success: true,
+      data: {
+        billId,
+        summary,
+        generatedAt: new Date().toISOString(),
+      },
+    });
+  } catch (error: any) {
+    console.error('Summarize error:', error);
+    res.status(500).json({
+      success: false,
+      error: { code: 'SUMMARIZE_ERROR', message: error.message || 'שגיאה ביצירת תקציר' },
+    });
   }
 });
 

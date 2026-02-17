@@ -13,5 +13,6 @@ export const config = {
     clientSecret: process.env.GOOGLE_CLIENT_SECRET || '',
   },
   openaiApiKey: process.env.OPENAI_API_KEY || '',
+  groqApiKey: process.env.GROQ_API_KEY || '',
   frontendUrl: process.env.FRONTEND_URL || 'http://localhost:5173',
 };
