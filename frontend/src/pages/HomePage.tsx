@@ -1,11 +1,10 @@
 import { useQuery } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
-import { FiTrendingUp, FiUsers, FiStar, FiArrowLeft, FiClock, FiPlay } from 'react-icons/fi';
+import { FiTrendingUp, FiUsers, FiStar, FiArrowLeft, FiClock } from 'react-icons/fi';
 import { api } from '../services/api';
 import BillCard from '../components/bills/BillCard';
+import ExplainerVideo from '../components/home/ExplainerVideo';
 import type { Bill } from '../types';
-
-const EXPLAINER_VIDEO_URL = 'https://ai.invideo.io/ai-mcp-video?video=-github--cwdvfl';
 
 export default function HomePage() {
   // Use the existing /bills endpoint with newest sort - works on deployed backend
@@ -77,75 +76,17 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* How It Works - Visual Explainer */}
-      <section className="max-w-7xl mx-auto px-4 py-16">
-        <div className="text-center mb-12">
+      {/* Explainer Video - Animated Slideshow */}
+      <section className="max-w-5xl mx-auto px-4 py-16">
+        <div className="text-center mb-8">
           <h2 className="text-3xl md:text-4xl font-black text-gray-900 mb-3">
             איך <span className="text-knesset-blue">חוקית</span> עובדת?
           </h2>
           <p className="text-lg text-gray-500 max-w-2xl mx-auto">
-            בדיוק כמו שגיטהב שינה את עולם התוכנה — חוקית משנה את הדרך שבה אזרחים מתחברים לחקיקה
+            צפו בסרטון ההסבר האינטראקטיבי שלנו
           </p>
         </div>
-
-        {/* 3-step process */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
-          <div className="relative text-center group">
-            <div className="w-20 h-20 bg-gradient-to-bl from-blue-500 to-knesset-blue rounded-2xl flex items-center justify-center mx-auto mb-5 shadow-lg shadow-blue-200 group-hover:scale-110 transition-transform">
-              <span className="text-3xl">📜</span>
-            </div>
-            <div className="absolute top-10 right-0 hidden md:block w-full h-0.5 bg-gradient-to-l from-transparent via-blue-200 to-transparent -z-10" />
-            <span className="inline-block bg-knesset-blue text-white text-xs font-bold px-3 py-1 rounded-full mb-3">שלב 1</span>
-            <h3 className="text-xl font-bold text-gray-900 mb-2">הצעות חוק אמיתיות</h3>
-            <p className="text-gray-500 text-sm leading-relaxed">
-              כל הצעות החוק מהכנסת מיובאות אוטומטית מה-API הרשמי ומתורגמות לשפה פשוטה באמצעות בינה מלאכותית
-            </p>
-          </div>
-
-          <div className="relative text-center group">
-            <div className="w-20 h-20 bg-gradient-to-bl from-amber-400 to-orange-500 rounded-2xl flex items-center justify-center mx-auto mb-5 shadow-lg shadow-amber-200 group-hover:scale-110 transition-transform">
-              <span className="text-3xl">⭐</span>
-            </div>
-            <span className="inline-block bg-amber-500 text-white text-xs font-bold px-3 py-1 rounded-full mb-3">שלב 2</span>
-            <h3 className="text-xl font-bold text-gray-900 mb-2">דרגו והגיבו</h3>
-            <p className="text-gray-500 text-sm leading-relaxed">
-              תנו כוכבים להצעות שחשובות לכם, כתבו תגובות והציעו שיפורים — בדיוק כמו Pull Request בגיטהב
-            </p>
-          </div>
-
-          <div className="relative text-center group">
-            <div className="w-20 h-20 bg-gradient-to-bl from-emerald-400 to-teal-600 rounded-2xl flex items-center justify-center mx-auto mb-5 shadow-lg shadow-emerald-200 group-hover:scale-110 transition-transform">
-              <span className="text-3xl">📊</span>
-            </div>
-            <span className="inline-block bg-emerald-600 text-white text-xs font-bold px-3 py-1 rounded-full mb-3">שלב 3</span>
-            <h3 className="text-xl font-bold text-gray-900 mb-2">עקבו אחרי הנתונים</h3>
-            <p className="text-gray-500 text-sm leading-relaxed">
-              דשבורדים מתקדמים מציגים בזמן אמת: שיאני חקיקה, זמני אישור, והשוואה בינלאומית
-            </p>
-          </div>
-        </div>
-
-        {/* Video CTA banner */}
-        <div className="bg-gradient-to-l from-knesset-blue via-blue-800 to-indigo-900 rounded-2xl p-8 flex flex-col md:flex-row items-center justify-between gap-6">
-          <div className="flex items-center gap-4">
-            <div className="w-14 h-14 bg-white/10 backdrop-blur-sm rounded-xl flex items-center justify-center flex-shrink-0">
-              <FiPlay className="text-knesset-gold" size={24} />
-            </div>
-            <div>
-              <h3 className="text-xl font-bold text-white">רוצים לראות את זה בפעולה?</h3>
-              <p className="text-blue-200 text-sm">צפו בסרטון ההסבר הקצר שלנו — דקה וחצי שישנו את הדרך שבה אתם חושבים על חקיקה</p>
-            </div>
-          </div>
-          <a
-            href={EXPLAINER_VIDEO_URL}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="bg-knesset-gold text-knesset-blue px-8 py-3 rounded-xl font-bold text-lg hover:bg-yellow-400 transition-colors flex items-center gap-2 whitespace-nowrap flex-shrink-0"
-          >
-            <FiPlay size={18} />
-            צפו בסרטון
-          </a>
-        </div>
+        <ExplainerVideo />
       </section>
 
       {/* Latest Bills */}
