@@ -112,30 +112,29 @@ export default function ExplainerVideo() {
   };
 
   return (
-    <div className="relative overflow-hidden rounded-3xl shadow-2xl select-none">
+    <div className="relative overflow-hidden rounded-3xl shadow-2xl select-none aspect-video">
       {/* Main slide area */}
       <div
-        className={`bg-gradient-to-bl ${slide.bg} transition-all duration-700 ease-in-out`}
-        style={{ minHeight: '420px' }}
+        className={`bg-gradient-to-bl ${slide.bg} transition-all duration-700 ease-in-out absolute inset-0`}
       >
-        <div className="flex flex-col items-center justify-center text-center px-8 py-16 md:px-16 md:py-20">
+        <div className="flex flex-col items-center justify-center text-center px-6 py-12 md:px-20 md:py-0 h-full">
           {/* Animated emoji */}
-          <div className="text-7xl md:text-8xl mb-8 animate-bounce" style={{ animationDuration: '2s' }}>
+          <div className="text-7xl md:text-9xl mb-6 md:mb-10 animate-bounce" style={{ animationDuration: '2s' }}>
             {slide.emoji}
           </div>
 
           {/* Title */}
           <h3
-            className="text-2xl md:text-4xl font-black text-white mb-6 max-w-3xl leading-tight transition-opacity duration-500"
+            className="text-2xl md:text-5xl font-black text-white mb-4 md:mb-8 max-w-4xl leading-tight transition-opacity duration-500"
             key={`title-${current}`}
           >
             {slide.title}
           </h3>
 
           {/* Body text */}
-          <div className="max-w-2xl" key={`body-${current}`}>
+          <div className="max-w-3xl" key={`body-${current}`}>
             {slide.body.split('\n').map((line, i) => (
-              <p key={i} className={`text-lg md:text-xl ${slide.accent} mb-2 leading-relaxed transition-opacity duration-500`}>
+              <p key={i} className={`text-base md:text-2xl ${slide.accent} mb-2 md:mb-3 leading-relaxed transition-opacity duration-500`}>
                 {line}
               </p>
             ))}
@@ -144,7 +143,7 @@ export default function ExplainerVideo() {
       </div>
 
       {/* Controls bar */}
-      <div className="absolute bottom-0 left-0 right-0 bg-black/40 backdrop-blur-md px-6 py-4">
+      <div className="absolute bottom-0 left-0 right-0 bg-black/40 backdrop-blur-md px-6 md:px-10 py-4 md:py-5">
         {/* Progress bars */}
         <div className="flex gap-1.5 mb-3">
           {SLIDES.map((_, i) => (

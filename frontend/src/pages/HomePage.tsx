@@ -77,7 +77,7 @@ export default function HomePage() {
       </section>
 
       {/* Explainer Video - Animated Slideshow */}
-      <section className="max-w-5xl mx-auto px-4 py-16">
+      <section className="max-w-7xl mx-auto px-4 py-16">
         <div className="text-center mb-8">
           <h2 className="text-3xl md:text-4xl font-black text-gray-900 mb-3">
             איך <span className="text-knesset-blue">חוקית</span> עובדת?
