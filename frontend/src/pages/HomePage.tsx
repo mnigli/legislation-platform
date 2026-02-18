@@ -76,14 +76,14 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Explainer Video - Animated Slideshow */}
+      {/* Legislation Simulator */}
       <section className="max-w-7xl mx-auto px-4 py-16">
         <div className="text-center mb-8">
           <h2 className="text-3xl md:text-4xl font-black text-gray-900 mb-3">
-            איך <span className="text-knesset-blue">חוקית</span> עובדת?
+            ⚡ סימולטור: מסע הצעת חוק בכנסת
           </h2>
           <p className="text-lg text-gray-500 max-w-2xl mx-auto">
-            צפו בסרטון ההסבר האינטראקטיבי שלנו
+            178 ימים, 8 שלבים, הצבעה אחת — צפו בתהליך החקיקה המלא
           </p>
         </div>
         <ExplainerVideo />
