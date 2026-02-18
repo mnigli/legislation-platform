@@ -1,232 +1,213 @@
 // ==================== TYPES ====================
 
 export interface QuizAnswers {
-  age: string;
-  gender: string;
-  city: string;
-  religiosity: string;
+  interests: string[];      // up to 3
+  lifeSituation: string[];  // up to 2
+  readingStyle: string;     // single choice
 }
 
 export interface QuizQuestion {
   id: keyof QuizAnswers;
   label: string;
+  subtitle: string;
   icon: string;
-  type: 'buttons' | 'autocomplete';
-  options?: { value: string; label: string }[];
-  placeholder?: string;
+  maxSelect: number;        // 1 = single, 2+ = multi
+  options: { value: string; label: string; icon: string }[];
 }
 
 // ==================== QUESTIONS ====================
 
 export const QUIZ_QUESTIONS: QuizQuestion[] = [
   {
-    id: 'age',
-    label: 'מה הגיל שלך?',
-    icon: '🎂',
-    type: 'buttons',
+    id: 'interests',
+    label: 'מה הכי חשוב לך לעקוב אחריו עכשיו?',
+    subtitle: 'בחר עד 3',
+    icon: '🎯',
+    maxSelect: 3,
     options: [
-      { value: '18-24', label: '18-24' },
-      { value: '25-34', label: '25-34' },
-      { value: '35-44', label: '35-44' },
-      { value: '45-54', label: '45-54' },
-      { value: '55-64', label: '55-64' },
-      { value: '65+', label: '65+' },
+      { value: 'cost_of_living', label: 'יוקר מחיה ומסים', icon: '💰' },
+      { value: 'housing', label: 'דיור ושכירות', icon: '🏠' },
+      { value: 'health', label: 'בריאות', icon: '🏥' },
+      { value: 'education', label: 'חינוך', icon: '📚' },
+      { value: 'transport', label: 'תחבורה', icon: '🚌' },
+      { value: 'security', label: 'ביטחון אישי', icon: '🛡️' },
+      { value: 'religion_state', label: 'דת ומדינה', icon: '🕊️' },
+      { value: 'tech_privacy', label: 'טכנולוגיה ופרטיות', icon: '💻' },
+      { value: 'environment', label: 'סביבה', icon: '🌿' },
+      { value: 'workers_rights', label: 'זכויות עובדים', icon: '👷' },
     ],
   },
   {
-    id: 'gender',
-    label: 'מגדר',
+    id: 'lifeSituation',
+    label: 'איזה תיאור הכי קרוב למצב החיים שלך עכשיו?',
+    subtitle: 'בחר עד 2',
     icon: '👤',
-    type: 'buttons',
+    maxSelect: 2,
     options: [
-      { value: 'זכר', label: 'זכר' },
-      { value: 'נקבה', label: 'נקבה' },
+      { value: 'parent', label: 'הורה לילדים', icon: '👨‍👩‍👧' },
+      { value: 'renter', label: 'שוכר דירה', icon: '🏠' },
+      { value: 'business_owner', label: 'בעל עסק או עצמאי', icon: '💼' },
+      { value: 'student_soldier', label: 'סטודנט או חייל', icon: '🎓' },
+      { value: 'retiree', label: 'גמלאי', icon: '🌅' },
+      { value: 'reservist', label: 'מילואים פעיל', icon: '🎖️' },
+      { value: 'chronic_caregiver', label: 'מטופל כרוני / בן משפחה מטפל', icon: '❤️‍🩹' },
+      { value: 'other', label: 'אחר', icon: '✨' },
     ],
   },
   {
-    id: 'city',
-    label: 'עיר מגורים',
-    icon: '🏙️',
-    type: 'autocomplete',
-    placeholder: 'הקלידו שם עיר...',
-  },
-  {
-    id: 'religiosity',
-    label: 'איך את/ה מגדיר/ה את עצמך?',
-    icon: '🕊️',
-    type: 'buttons',
+    id: 'readingStyle',
+    label: 'איך תרצה לקרוא הצעות חוק?',
+    subtitle: 'בחר אחד',
+    icon: '📖',
+    maxSelect: 1,
     options: [
-      { value: 'חרדי', label: 'חרדי/ת' },
-      { value: 'דתי', label: 'דתי/ה' },
-      { value: 'מסורתי', label: 'מסורתי/ת' },
-      { value: 'חילוני', label: 'חילוני/ת' },
+      { value: 'short', label: 'תקציר קצר מאוד', icon: '⚡' },
+      { value: 'detailed', label: 'תקציר פשוט ומפורט', icon: '📝' },
+      { value: 'full', label: 'טקסט מלא עם סעיפים', icon: '📄' },
     ],
   },
 ];
 
-// ==================== ISRAELI CITIES ====================
+// ==================== INTEREST → CATEGORIES/TERMS MAPPING ====================
 
-export const ISRAELI_CITIES = [
-  'תל אביב-יפו', 'ירושלים', 'חיפה', 'באר שבע', 'ראשון לציון',
-  'פתח תקווה', 'אשדוד', 'נתניה', 'בני ברק', 'חולון',
-  'רמת גן', 'אשקלון', 'בת ים', 'הרצליה', 'כפר סבא',
-  'רעננה', 'מודיעין-מכבים-רעות', 'לוד', 'רמלה', 'נצרת',
-  'עכו', 'אילת', 'טבריה', 'צפת', 'דימונה',
-  'ערד', 'קריית שמונה', 'קריית גת', 'אור יהודה',
-  'יבנה', 'עפולה', 'כרמיאל', 'נהריה', 'רהט',
-  'אום אל-פחם', 'טייבה', 'סכנין', 'שפרעם',
-  'מעלה אדומים', 'אריאל', 'ביתר עילית', 'אלעד',
-  'גבעתיים', 'רמת השרון', 'הוד השרון', 'נס ציונה',
-  'קריית אתא', 'קריית ביאליק', 'קריית מוצקין',
-  'טירת כרמל', 'יהוד-מונוסון', 'גבעת שמואל',
-  'עראבה', 'באקה אל-גרבייה', 'קלנסווה',
-  'אור עקיבא', 'נשר', 'מגדל העמק', 'יקנעם',
-  'שדרות', 'אופקים', 'נתיבות', 'ירוחם',
-  'כפר קאסם', 'טמרה', 'דאלית אל-כרמל',
-  'בית שמש', 'בית שאן', 'עראד', 'מצפה רמון',
-];
-
-// ==================== CITY → REGION MAPPING ====================
-
-const CITY_REGIONS: Record<string, string[]> = {
-  // South
-  'באר שבע': ['נגב', 'פריפריה'],
-  'אשדוד': ['דרום'],
-  'אשקלון': ['דרום', 'עוטף עזה'],
-  'דימונה': ['נגב', 'פריפריה'],
-  'ערד': ['נגב', 'פריפריה'],
-  'עראד': ['נגב', 'פריפריה'],
-  'אילת': ['אילת', 'תיירות', 'פריפריה'],
-  'שדרות': ['עוטף עזה', 'פריפריה'],
-  'אופקים': ['נגב', 'פריפריה'],
-  'נתיבות': ['נגב', 'פריפריה'],
-  'ירוחם': ['נגב', 'פריפריה'],
-  'מצפה רמון': ['נגב', 'פריפריה'],
-  'קריית גת': ['דרום'],
-  'רהט': ['נגב', 'בדואים'],
-  // North
-  'חיפה': ['צפון'],
-  'נצרת': ['גליל', 'ערבי'],
-  'צפת': ['גליל', 'פריפריה'],
-  'טבריה': ['גליל', 'פריפריה'],
-  'עכו': ['גליל'],
-  'קריית שמונה': ['גליל', 'פריפריה', 'גבול'],
-  'כרמיאל': ['גליל'],
-  'נהריה': ['גליל'],
-  'עפולה': ['עמק יזרעאל'],
-  'מגדל העמק': ['גליל', 'פריפריה'],
-  'בית שאן': ['עמק', 'פריפריה'],
-  'סכנין': ['גליל', 'ערבי'],
-  'שפרעם': ['גליל', 'ערבי'],
-  'טמרה': ['גליל', 'ערבי'],
-  'עראבה': ['גליל', 'ערבי'],
-  'אום אל-פחם': ['ערבי'],
-  'טייבה': ['משולש', 'ערבי'],
-  'באקה אל-גרבייה': ['משולש', 'ערבי'],
-  'קלנסווה': ['משולש', 'ערבי'],
-  'כפר קאסם': ['ערבי'],
-  'דאלית אל-כרמל': ['דרוזי'],
-  // Center
-  'תל אביב-יפו': ['תחבורה', 'דיור'],
-  'ראשון לציון': ['מרכז'],
-  'פתח תקווה': ['מרכז'],
-  'נתניה': ['שרון'],
-  'חולון': ['מרכז'],
-  'רמת גן': ['מרכז'],
-  'בת ים': ['מרכז'],
-  'הרצליה': ['שרון'],
-  'כפר סבא': ['שרון'],
-  'רעננה': ['שרון'],
-  'גבעתיים': ['מרכז'],
-  'בני ברק': ['חרדי'],
-  'לוד': ['מרכז'],
-  'רמלה': ['מרכז'],
-  // Jerusalem
-  'ירושלים': ['ירושלים'],
-  'מעלה אדומים': ['יהודה ושומרון'],
-  'ביתר עילית': ['חרדי', 'יהודה ושומרון'],
-  'אריאל': ['יהודה ושומרון'],
-  'בית שמש': ['ירושלים'],
-  'מודיעין-מכבים-רעות': ['מרכז'],
-  'אלעד': ['חרדי'],
+const INTEREST_MAPPING: Record<string, { categories: string[]; searchTerms: string[] }> = {
+  cost_of_living: { categories: ['כלכלה', 'צרכנות'], searchTerms: ['מסים', 'יוקר', 'מע"מ', 'אגרה'] },
+  housing: { categories: ['דיור'], searchTerms: ['שכירות', 'דיור', 'משכנתא', 'בנייה'] },
+  health: { categories: ['בריאות'], searchTerms: ['בריאות', 'רפואה', 'ביטוח בריאות'] },
+  education: { categories: ['חינוך'], searchTerms: ['חינוך', 'בית ספר', 'אוניברסיטה'] },
+  transport: { categories: ['תחבורה'], searchTerms: ['תחבורה', 'רכב', 'רכבת'] },
+  security: { categories: ['ביטחון'], searchTerms: ['ביטחון', 'משטרה'] },
+  religion_state: { categories: [], searchTerms: ['דת', 'כשרות', 'שבת', 'נישואין'] },
+  tech_privacy: { categories: ['טכנולוגיה'], searchTerms: ['פרטיות', 'מידע', 'סייבר', 'טכנולוגיה'] },
+  environment: { categories: ['סביבה'], searchTerms: ['סביבה', 'זיהום', 'אקלים'] },
+  workers_rights: { categories: ['רווחה'], searchTerms: ['עובדים', 'שכר', 'פיטורים', 'זכויות'] },
 };
 
-// ==================== MAPPING LOGIC ====================
+const LIFE_SITUATION_MAPPING: Record<string, { categories: string[]; searchTerms: string[] }> = {
+  parent: { categories: ['חינוך', 'רווחה'], searchTerms: ['ילדים', 'משפחה', 'הורים'] },
+  renter: { categories: ['דיור'], searchTerms: ['שכירות', 'דיור'] },
+  business_owner: { categories: ['כלכלה', 'תעשייה'], searchTerms: ['עסקים', 'עצמאי', 'מע"מ'] },
+  student_soldier: { categories: ['חינוך'], searchTerms: ['סטודנטים', 'גיוס', 'שכר לימוד'] },
+  retiree: { categories: ['רווחה', 'בריאות'], searchTerms: ['פנסיה', 'קשישים', 'סיעוד'] },
+  reservist: { categories: ['ביטחון'], searchTerms: ['מילואים', 'חיילים'] },
+  chronic_caregiver: { categories: ['בריאות', 'רווחה'], searchTerms: ['חולים', 'סיעוד', 'נכות'] },
+  other: { categories: [], searchTerms: [] },
+};
 
-interface MappingResult {
-  categories: string[];
-  searchTerms: string[];
-}
+// ==================== INTEREST LABELS (for display) ====================
 
-export function getRelevantMapping(answers: QuizAnswers): MappingResult {
-  const categories = new Set<string>();
-  const searchTerms = new Set<string>();
+export const INTEREST_LABELS: Record<string, string> = {
+  cost_of_living: 'יוקר מחיה ומסים',
+  housing: 'דיור ושכירות',
+  health: 'בריאות',
+  education: 'חינוך',
+  transport: 'תחבורה',
+  security: 'ביטחון אישי',
+  religion_state: 'דת ומדינה',
+  tech_privacy: 'טכנולוגיה ופרטיות',
+  environment: 'סביבה',
+  workers_rights: 'זכויות עובדים',
+};
 
-  // === Age-based mapping ===
-  const ageMap: Record<string, { cats: string[]; terms: string[] }> = {
-    '18-24': { cats: ['דיור', 'חינוך', 'כלכלה'], terms: ['סטודנטים'] },
-    '25-34': { cats: ['דיור', 'כלכלה', 'טכנולוגיה'], terms: ['דיור'] },
-    '35-44': { cats: ['חינוך', 'בריאות', 'כלכלה'], terms: ['ילדים'] },
-    '45-54': { cats: ['כלכלה', 'בריאות', 'ביטחון'], terms: ['מיסוי'] },
-    '55-64': { cats: ['רווחה', 'בריאות', 'כלכלה'], terms: ['פנסיה'] },
-    '65+':   { cats: ['בריאות', 'רווחה'], terms: ['קשישים', 'סיעוד'] },
-  };
-  const ageCfg = ageMap[answers.age];
-  if (ageCfg) {
-    ageCfg.cats.forEach(c => categories.add(c));
-    ageCfg.terms.forEach(t => searchTerms.add(t));
+export const LIFE_LABELS: Record<string, string> = {
+  parent: 'הורה לילדים',
+  renter: 'שוכר דירה',
+  business_owner: 'בעל עסק / עצמאי',
+  student_soldier: 'סטודנט / חייל',
+  retiree: 'גמלאי',
+  reservist: 'מילואים פעיל',
+  chronic_caregiver: 'מטופל כרוני / מטפל',
+  other: 'אחר',
+};
+
+export const READING_LABELS: Record<string, string> = {
+  short: 'תקציר קצר מאוד',
+  detailed: 'תקציר פשוט ומפורט',
+  full: 'טקסט מלא עם סעיפים',
+};
+
+// ==================== "WHY HERE" MAPPING ====================
+
+/** Given a bill's categories and the user's answers, produce a "why here" reason */
+export function getWhyHereReason(billCategories: string[], answers: QuizAnswers): string | null {
+  // Check interests first
+  for (const interest of answers.interests) {
+    const mapping = INTEREST_MAPPING[interest];
+    if (!mapping) continue;
+    for (const cat of mapping.categories) {
+      if (billCategories.includes(cat)) {
+        return `מופיע כי בחרת ${INTEREST_LABELS[interest] || interest}`;
+      }
+    }
   }
-
-  // === Religiosity-based mapping ===
-  const religMap: Record<string, { cats: string[]; terms: string[] }> = {
-    'חרדי':   { cats: ['חינוך'], terms: ['חרדי', 'גיוס'] },
-    'דתי':    { cats: ['חינוך'], terms: ['דתי'] },
-    'מסורתי': { cats: [], terms: [] },
-    'חילוני':  { cats: ['טכנולוגיה', 'סביבה'], terms: ['תחבורה'] },
-  };
-  const relCfg = religMap[answers.religiosity];
-  if (relCfg) {
-    relCfg.cats.forEach(c => categories.add(c));
-    relCfg.terms.forEach(t => searchTerms.add(t));
+  // Check life situations
+  for (const life of answers.lifeSituation) {
+    const mapping = LIFE_SITUATION_MAPPING[life];
+    if (!mapping) continue;
+    for (const cat of mapping.categories) {
+      if (billCategories.includes(cat)) {
+        return `מופיע כי בחרת ${LIFE_LABELS[life] || life}`;
+      }
+    }
   }
-
-  // === City-based mapping ===
-  const cityTerms = CITY_REGIONS[answers.city];
-  if (cityTerms) {
-    cityTerms.forEach(t => searchTerms.add(t));
-  }
-
-  return {
-    categories: Array.from(categories),
-    searchTerms: Array.from(searchTerms),
-  };
+  return null;
 }
 
 // ==================== BUILD API QUERIES ====================
 
 export function buildBillQueries(answers: QuizAnswers): Record<string, string>[] {
-  const { categories, searchTerms } = getRelevantMapping(answers);
-  const queries: Record<string, string>[] = [];
+  const categories = new Set<string>();
+  const searchTerms = new Set<string>();
 
-  // Top 3 category queries
-  categories.slice(0, 3).forEach(cat => {
-    queries.push({ category: cat, limit: '3', sort: 'newest' });
-  });
-
-  // Top search term
-  if (searchTerms.length > 0) {
-    queries.push({ search: searchTerms[0], limit: '3', sort: 'newest' });
+  // Map interests
+  for (const interest of answers.interests) {
+    const mapping = INTEREST_MAPPING[interest];
+    if (mapping) {
+      mapping.categories.forEach(c => categories.add(c));
+      mapping.searchTerms.forEach(t => searchTerms.add(t));
+    }
   }
 
-  // Fallback: always include newest bills as backup
-  queries.push({ limit: '5', sort: 'newest' });
+  // Map life situations
+  for (const life of answers.lifeSituation) {
+    const mapping = LIFE_SITUATION_MAPPING[life];
+    if (mapping) {
+      mapping.categories.forEach(c => categories.add(c));
+      mapping.searchTerms.forEach(t => searchTerms.add(t));
+    }
+  }
+
+  const queries: Record<string, string>[] = [];
+
+  // Category queries (top 4)
+  Array.from(categories).slice(0, 4).forEach(cat => {
+    queries.push({ category: cat, limit: '5', sort: 'newest' });
+  });
+
+  // Top 2 search terms
+  Array.from(searchTerms).slice(0, 2).forEach(term => {
+    queries.push({ search: term, limit: '3', sort: 'newest' });
+  });
+
+  // Fallback: newest bills
+  queries.push({ limit: '6', sort: 'newest' });
 
   return queries;
 }
 
+// Query for "most discussed" bills (high view/comment count)
+export function buildTrendingQuery(): Record<string, string> {
+  return { limit: '5', sort: 'popular' };
+}
+
+// Query for bills in upcoming stages
+export function buildUpcomingQuery(): Record<string, string> {
+  return { limit: '5', sort: 'newest' };
+}
+
 // ==================== LOCALSTORAGE ====================
 
-const STORAGE_KEY = 'hukit-demographic-answers';
+const STORAGE_KEY = 'hukit-quiz-answers-v2';
 
 export function saveQuizAnswers(answers: QuizAnswers): void {
   try {
@@ -237,7 +218,13 @@ export function saveQuizAnswers(answers: QuizAnswers): void {
 export function loadQuizAnswers(): QuizAnswers | null {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
-    if (raw) return JSON.parse(raw);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      // Validate new format
+      if (Array.isArray(parsed.interests) && Array.isArray(parsed.lifeSituation) && parsed.readingStyle) {
+        return parsed;
+      }
+    }
   } catch {}
   return null;
 }
@@ -245,5 +232,7 @@ export function loadQuizAnswers(): QuizAnswers | null {
 export function clearQuizAnswers(): void {
   try {
     localStorage.removeItem(STORAGE_KEY);
+    // Also clear old format
+    localStorage.removeItem('hukit-demographic-answers');
   } catch {}
 }

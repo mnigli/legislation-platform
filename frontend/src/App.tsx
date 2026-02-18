@@ -12,6 +12,7 @@ import ProfilePage from './pages/ProfilePage';
 import AboutPage from './pages/AboutPage';
 import KnessetImportPage from './pages/KnessetImportPage';
 import DashboardPage from './pages/DashboardPage';
+import BillExplorePage from './pages/BillExplorePage';
 import { useAuthStore } from './stores/authStore';
 
 export default function App() {
@@ -34,6 +35,7 @@ export default function App() {
           <Route path="/" element={<HomePage />} />
           <Route path="/bills" element={<BillsPage />} />
           <Route path="/bill/:id" element={<BillDetailPage />} />
+          <Route path="/bill/:id/explore" element={<BillExplorePage />} />
           <Route path="/search" element={<SearchPage />} />
           <Route path="/leaderboard" element={<LeaderboardPage />} />
           <Route path="/profile/:id" element={<ProfilePage />} />

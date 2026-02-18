@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { FiTarget } from 'react-icons/fi';
 import QuizStep from './QuizStep';
 import QuizResults from './QuizResults';
@@ -10,9 +10,15 @@ import {
 } from '../../lib/demographicMapping';
 import type { QuizAnswers } from '../../lib/demographicMapping';
 
+const EMPTY_ANSWERS: QuizAnswers = {
+  interests: [],
+  lifeSituation: [],
+  readingStyle: '',
+};
+
 export default function DemographicQuestionnaire() {
   const [currentStep, setCurrentStep] = useState(0);
-  const [answers, setAnswers] = useState<Partial<QuizAnswers>>({});
+  const [answers, setAnswers] = useState<QuizAnswers>({ ...EMPTY_ANSWERS });
   const [isComplete, setIsComplete] = useState(false);
   const [savedAnswers, setSavedAnswers] = useState<QuizAnswers | null>(null);
 
@@ -25,34 +31,76 @@ export default function DemographicQuestionnaire() {
     }
   }, []);
 
-  const handleAnswer = (value: string) => {
-    const question = QUIZ_QUESTIONS[currentStep];
-    const newAnswers = { ...answers, [question.id]: value };
+  const question = QUIZ_QUESTIONS[currentStep];
+  const isSingleSelect = question?.maxSelect === 1;
+
+  const handleAnswer = useCallback((value: string[] | string) => {
+    const qId = question.id;
+    const newAnswers = { ...answers };
+
+    if (qId === 'interests') {
+      newAnswers.interests = value as string[];
+    } else if (qId === 'lifeSituation') {
+      newAnswers.lifeSituation = value as string[];
+    } else if (qId === 'readingStyle') {
+      newAnswers.readingStyle = value as string;
+    }
+
     setAnswers(newAnswers);
 
-    // Auto-advance after short delay
-    setTimeout(() => {
-      if (currentStep < QUIZ_QUESTIONS.length - 1) {
-        setCurrentStep(currentStep + 1);
-      } else {
-        // Quiz complete
-        const fullAnswers = newAnswers as QuizAnswers;
-        saveQuizAnswers(fullAnswers);
-        setSavedAnswers(fullAnswers);
-        setIsComplete(true);
-      }
-    }, 300);
-  };
+    // Auto-advance for single-select questions
+    if (isSingleSelect && typeof value === 'string') {
+      setTimeout(() => {
+        if (currentStep < QUIZ_QUESTIONS.length - 1) {
+          setCurrentStep(currentStep + 1);
+        } else {
+          // Last question — complete
+          saveQuizAnswers(newAnswers);
+          setSavedAnswers(newAnswers);
+          setIsComplete(true);
+        }
+      }, 300);
+    }
+  }, [question, answers, currentStep, isSingleSelect]);
 
-  const handleRetake = () => {
+  const handleNext = useCallback(() => {
+    if (currentStep < QUIZ_QUESTIONS.length - 1) {
+      setCurrentStep(currentStep + 1);
+    } else {
+      // Last question — complete
+      saveQuizAnswers(answers);
+      setSavedAnswers(answers);
+      setIsComplete(true);
+    }
+  }, [currentStep, answers]);
+
+  const handleRetake = useCallback(() => {
     clearQuizAnswers();
     setSavedAnswers(null);
     setIsComplete(false);
     setCurrentStep(0);
-    setAnswers({});
-  };
+    setAnswers({ ...EMPTY_ANSWERS });
+  }, []);
 
-  const displayAnswers = savedAnswers || (answers as QuizAnswers);
+  // Current answer for the step
+  const currentValue = question
+    ? question.id === 'interests'
+      ? answers.interests
+      : question.id === 'lifeSituation'
+      ? answers.lifeSituation
+      : answers.readingStyle
+    : '';
+
+  // Check if current step has a valid selection
+  const canAdvance = question
+    ? question.id === 'interests'
+      ? answers.interests.length > 0
+      : question.id === 'lifeSituation'
+      ? answers.lifeSituation.length > 0
+      : !!answers.readingStyle
+    : false;
+
+  const displayAnswers = savedAnswers || answers;
 
   return (
     <section className="max-w-7xl mx-auto px-4 pb-16">
@@ -63,15 +111,19 @@ export default function DemographicQuestionnaire() {
             <FiTarget className="text-white" size={20} />
           </div>
           <h2 className="text-3xl md:text-4xl font-black text-gray-900">
-            {isComplete ? 'הצעות חוק רלוונטיות עבורך' : 'גלו איזו חקיקה רלוונטית עבורכם'}
+            {isComplete ? 'הצעות חוק בשבילך' : 'בואו נמצא את החקיקה שבאמת נוגעת אליך'}
           </h2>
         </div>
-        <p className="text-lg text-gray-500 max-w-2xl mx-auto">
-          {isComplete
-            ? 'על סמך הפרופיל שלך, אלו הצעות החוק שהכי רלוונטיות עבורך'
-            : 'ענו על 4 שאלות קצרות ונמצא את הצעות החוק שהכי משפיעות עליכם'
-          }
-        </p>
+        {!isComplete && (
+          <p className="text-lg text-gray-500 max-w-2xl mx-auto">
+            6 קליקים וזה הכל
+          </p>
+        )}
+        {isComplete && (
+          <p className="text-base text-gray-400 max-w-2xl mx-auto">
+            נבחר לפי תחומי העניין ומצב החיים שסימנת. תמיד אפשר לשנות.
+          </p>
+        )}
       </div>
 
       {/* Content */}
@@ -81,12 +133,36 @@ export default function DemographicQuestionnaire() {
         <div className="max-w-2xl mx-auto">
           <div className="bg-white rounded-3xl border border-gray-100 shadow-lg p-8 md:p-12">
             <QuizStep
-              question={QUIZ_QUESTIONS[currentStep]}
-              value={answers[QUIZ_QUESTIONS[currentStep].id] || ''}
+              question={question}
+              value={currentValue}
               onChange={handleAnswer}
               stepNumber={currentStep + 1}
               totalSteps={QUIZ_QUESTIONS.length}
             />
+
+            {/* Next button for multi-select questions */}
+            {!isSingleSelect && (
+              <div className="mt-8 flex justify-center">
+                <button
+                  onClick={handleNext}
+                  disabled={!canAdvance}
+                  className={`
+                    px-8 py-3 rounded-2xl font-bold text-lg transition-all duration-200
+                    ${canAdvance
+                      ? 'bg-knesset-blue text-white hover:bg-blue-800 shadow-lg shadow-blue-200 hover:scale-105'
+                      : 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                    }
+                  `}
+                >
+                  {currentStep === QUIZ_QUESTIONS.length - 1 ? 'הצג לי הצעות חוק שמתאימות לי' : 'המשך'}
+                </button>
+              </div>
+            )}
+
+            {/* Trust line */}
+            <p className="text-center text-xs text-gray-400 mt-6">
+              🔒 אפשר לשנות העדפות בכל רגע. ההצעות מוצגות לפי תחומי עניין שבחרת בלבד.
+            </p>
           </div>
         </div>
       )}
