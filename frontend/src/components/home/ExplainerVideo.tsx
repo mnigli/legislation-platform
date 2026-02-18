@@ -112,20 +112,20 @@ export default function ExplainerVideo() {
   };
 
   return (
-    <div className="relative overflow-hidden rounded-3xl shadow-2xl select-none aspect-video">
+    <div className="relative overflow-hidden rounded-3xl shadow-2xl select-none" style={{ aspectRatio: '21/9' }}>
       {/* Main slide area */}
       <div
         className={`bg-gradient-to-bl ${slide.bg} transition-all duration-700 ease-in-out absolute inset-0`}
       >
-        <div className="flex flex-col items-center justify-center text-center px-6 py-12 md:px-20 md:py-0 h-full">
+        <div className="flex flex-col items-center justify-center text-center px-6 md:px-20 h-full pb-16">
           {/* Animated emoji */}
-          <div className="text-7xl md:text-9xl mb-6 md:mb-10 animate-bounce" style={{ animationDuration: '2s' }}>
+          <div className="text-5xl md:text-7xl mb-4 md:mb-6 animate-bounce" style={{ animationDuration: '2s' }}>
             {slide.emoji}
           </div>
 
           {/* Title */}
           <h3
-            className="text-2xl md:text-5xl font-black text-white mb-4 md:mb-8 max-w-4xl leading-tight transition-opacity duration-500"
+            className="text-xl md:text-4xl font-black text-white mb-3 md:mb-5 max-w-4xl leading-tight transition-opacity duration-500"
             key={`title-${current}`}
           >
             {slide.title}
@@ -134,7 +134,7 @@ export default function ExplainerVideo() {
           {/* Body text */}
           <div className="max-w-3xl" key={`body-${current}`}>
             {slide.body.split('\n').map((line, i) => (
-              <p key={i} className={`text-base md:text-2xl ${slide.accent} mb-2 md:mb-3 leading-relaxed transition-opacity duration-500`}>
+              <p key={i} className={`text-sm md:text-xl ${slide.accent} mb-1 md:mb-2 leading-relaxed transition-opacity duration-500`}>
                 {line}
               </p>
             ))}
