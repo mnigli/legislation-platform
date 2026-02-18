@@ -4,6 +4,7 @@ import { FiTrendingUp, FiUsers, FiStar } from 'react-icons/fi';
 import { api } from '../services/api';
 import WhatIsHukit from '../components/home/WhatIsHukit';
 import ExplainerVideo from '../components/home/ExplainerVideo';
+import DemographicQuestionnaire from '../components/questionnaire/DemographicQuestionnaire';
 import type { Bill } from '../types';
 
 export default function HomePage() {
@@ -98,21 +99,8 @@ export default function HomePage() {
         <ExplainerVideo />
       </section>
 
-      {/* Categories */}
-      <section className="max-w-7xl mx-auto px-4 pb-12">
-        <h2 className="text-2xl font-bold mb-6">חקיקה לפי נושא</h2>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          {['חינוך', 'בריאות', 'כלכלה', 'סביבה', 'דיור', 'ביטחון', 'צרכנות', 'טכנולוגיה'].map((cat) => (
-            <Link
-              key={cat}
-              to={`/bills?category=${encodeURIComponent(cat)}`}
-              className="card text-center hover:shadow-md hover:border-primary-200 transition-all group"
-            >
-              <span className="text-lg font-bold text-gray-700 group-hover:text-primary-600">{cat}</span>
-            </Link>
-          ))}
-        </div>
-      </section>
+      {/* Demographic Questionnaire */}
+      <DemographicQuestionnaire />
     </div>
   );
 }
