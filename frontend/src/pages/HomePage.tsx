@@ -1,23 +1,19 @@
 import { useQuery } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
-import { FiTrendingUp, FiUsers, FiStar, FiArrowLeft, FiClock } from 'react-icons/fi';
+import { FiTrendingUp, FiUsers, FiStar } from 'react-icons/fi';
 import { api } from '../services/api';
-import BillCard from '../components/bills/BillCard';
+import WhatIsHukit from '../components/home/WhatIsHukit';
 import ExplainerVideo from '../components/home/ExplainerVideo';
 import type { Bill } from '../types';
 
 export default function HomePage() {
-  // Use the existing /bills endpoint with newest sort - works on deployed backend
-  const { data: latestRes, isLoading } = useQuery({
+  const { data: latestRes } = useQuery({
     queryKey: ['bills', 'homepage-latest'],
     queryFn: () => api.getBills({ sort: 'newest', limit: '6' }),
   });
 
-  // Also get total count from pagination meta
   const latestBills: Bill[] = latestRes?.data || [];
   const totalBills = latestRes?.meta?.pagination?.total || 0;
-
-  // Calculate stats from displayed bills + total
   const totalStars = latestBills.reduce((sum: number, b: Bill) => sum + b.starCount, 0);
   const totalComments = latestBills.reduce((sum: number, b: Bill) => sum + b.commentCount, 0);
 
@@ -76,8 +72,21 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Legislation Simulator */}
+      {/* What is Hukit - Explainer Video */}
       <section className="max-w-7xl mx-auto px-4 py-16">
+        <div className="text-center mb-8">
+          <h2 className="text-3xl md:text-4xl font-black text-gray-900 mb-3">
+            🎬 מה זה <span className="text-knesset-blue">חוקית</span>?
+          </h2>
+          <p className="text-lg text-gray-500 max-w-2xl mx-auto">
+            פלטפורמה שהופכת את החקיקה הישראלית לנגישה, שקופה ומשתפת
+          </p>
+        </div>
+        <WhatIsHukit />
+      </section>
+
+      {/* Legislation Simulator */}
+      <section className="max-w-7xl mx-auto px-4 pb-16">
         <div className="text-center mb-8">
           <h2 className="text-3xl md:text-4xl font-black text-gray-900 mb-3">
             ⚡ סימולטור: מסע הצעת חוק בכנסת
@@ -87,36 +96,6 @@ export default function HomePage() {
           </p>
         </div>
         <ExplainerVideo />
-      </section>
-
-      {/* Latest Bills */}
-      <section className="max-w-7xl mx-auto px-4 py-12">
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-2xl font-bold flex items-center gap-2">
-            <FiClock className="text-primary-500" /> הצעות חוק אחרונות מהכנסת
-          </h2>
-          <Link to="/bills" className="text-primary-600 hover:text-primary-700 flex items-center gap-1 font-medium">
-            כל ההצעות <FiArrowLeft size={16} />
-          </Link>
-        </div>
-
-        {isLoading ? (
-          <div className="grid grid-cols-1 gap-4">
-            {[1, 2, 3].map((i) => (
-              <div key={i} className="card animate-pulse">
-                <div className="h-4 bg-gray-200 rounded w-1/4 mb-3" />
-                <div className="h-6 bg-gray-200 rounded w-3/4 mb-2" />
-                <div className="h-4 bg-gray-200 rounded w-1/2" />
-              </div>
-            ))}
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 gap-4">
-            {latestBills.map((bill: Bill) => (
-              <BillCard key={bill.id} bill={bill} />
-            ))}
-          </div>
-        )}
       </section>
 
       {/* Categories */}
