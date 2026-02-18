@@ -13,6 +13,12 @@ import AboutPage from './pages/AboutPage';
 import KnessetImportPage from './pages/KnessetImportPage';
 import DashboardPage from './pages/DashboardPage';
 import BillExplorePage from './pages/BillExplorePage';
+import OrgsHomePage from './pages/portals/OrgsHomePage';
+import OrgsBillPage from './pages/portals/OrgsBillPage';
+import MediaHomePage from './pages/portals/MediaHomePage';
+import MediaBillPage from './pages/portals/MediaBillPage';
+import MkHomePage from './pages/portals/MkHomePage';
+import MkBillPage from './pages/portals/MkBillPage';
 import { useAuthStore } from './stores/authStore';
 
 export default function App() {
@@ -43,6 +49,13 @@ export default function App() {
           <Route path="/about" element={<AboutPage />} />
           <Route path="/dashboard" element={<DashboardPage />} />
           <Route path="/admin/import" element={<KnessetImportPage />} />
+          {/* Portal routes */}
+          <Route path="/orgs" element={<OrgsHomePage />} />
+          <Route path="/orgs/bill/:id" element={<OrgsBillPage />} />
+          <Route path="/media" element={<MediaHomePage />} />
+          <Route path="/media/bill/:id" element={<MediaBillPage />} />
+          <Route path="/mk" element={<MkHomePage />} />
+          <Route path="/mk/bill/:id" element={<MkBillPage />} />
         </Route>
       </Routes>
     </>

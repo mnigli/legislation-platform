@@ -1,6 +1,6 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { useState } from 'react';
-import { FiSearch, FiBell, FiMenu, FiX, FiLogOut, FiUser, FiStar, FiDownload, FiBarChart2 } from 'react-icons/fi';
+import { FiSearch, FiBell, FiMenu, FiX, FiLogOut, FiUser, FiStar, FiDownload, FiBarChart2, FiBriefcase, FiRadio, FiAward } from 'react-icons/fi';
 import { useAuthStore } from '../../stores/authStore';
 
 export default function Header() {
@@ -57,6 +57,19 @@ export default function Header() {
               <FiDownload size={14} />
               ייבוא
             </Link>
+            <span className="text-white/30">|</span>
+            <Link to="/orgs" className="hover:text-knesset-gold transition-colors flex items-center gap-1">
+              <FiBriefcase size={14} />
+              עמותות
+            </Link>
+            <Link to="/media" className="hover:text-knesset-gold transition-colors flex items-center gap-1">
+              <FiRadio size={14} />
+              תקשורת
+            </Link>
+            <Link to="/mk" className="hover:text-knesset-gold transition-colors flex items-center gap-1">
+              <FiAward size={14} />
+              חכ"ים
+            </Link>
 
             {user ? (
               <div className="flex items-center gap-3">
@@ -105,6 +118,10 @@ export default function Header() {
               <Link to="/dashboard" onClick={() => setMenuOpen(false)} className="hover:text-knesset-gold flex items-center gap-1"><FiBarChart2 size={14} /> דשבורד</Link>
               <Link to="/leaderboard" onClick={() => setMenuOpen(false)} className="hover:text-knesset-gold">לוח מובילים</Link>
               <Link to="/admin/import" onClick={() => setMenuOpen(false)} className="hover:text-knesset-gold flex items-center gap-1"><FiDownload size={14} /> ייבוא מהכנסת</Link>
+              <div className="border-t border-white/20 my-2" />
+              <Link to="/orgs" onClick={() => setMenuOpen(false)} className="hover:text-knesset-gold flex items-center gap-1"><FiBriefcase size={14} /> עמותות וארגונים</Link>
+              <Link to="/media" onClick={() => setMenuOpen(false)} className="hover:text-knesset-gold flex items-center gap-1"><FiRadio size={14} /> תקשורת</Link>
+              <Link to="/mk" onClick={() => setMenuOpen(false)} className="hover:text-knesset-gold flex items-center gap-1"><FiAward size={14} /> חברי כנסת</Link>
               {user ? (
                 <>
                   <Link to={`/profile/${user.id}`} onClick={() => setMenuOpen(false)} className="hover:text-knesset-gold">הפרופיל שלי</Link>
