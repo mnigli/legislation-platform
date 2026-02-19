@@ -44,10 +44,11 @@ export interface DemoCollaboration {
 
 export const DEMO_ORG_COLLABORATIONS: DemoCollaboration[] = [
   { orgName: 'אדם טבע ודין', orgIcon: '🌿', billIndex: 0, stance: 'for', coalitionOpen: true, members: 5 },
-  { orgName: 'האגודה לזכויות האזרח', orgIcon: '⚖️', billIndex: 1, stance: 'against', coalitionOpen: true, members: 8 },
-  { orgName: 'ידיד – מרכזי זכויות', orgIcon: '🤝', billIndex: 2, stance: 'for', coalitionOpen: false, members: 3 },
-  { orgName: 'הקליניקה לזכויות בריאות', orgIcon: '🏥', billIndex: 3, stance: 'mixed', coalitionOpen: true, members: 4 },
-  { orgName: 'במקום – מתכננים למען זכויות', orgIcon: '🏗️', billIndex: 4, stance: 'for', coalitionOpen: true, members: 6 },
+  { orgName: 'המכון למדיניות העם היהודי', orgIcon: '🏛️', billIndex: 1, stance: 'for', coalitionOpen: true, members: 10 },
+  { orgName: 'לובי 99', orgIcon: '📊', billIndex: 2, stance: 'for', coalitionOpen: true, members: 12 },
+  { orgName: 'ידיד – מרכזי זכויות', orgIcon: '🤝', billIndex: 3, stance: 'for', coalitionOpen: false, members: 3 },
+  { orgName: 'הקליניקה לזכויות בריאות', orgIcon: '🏥', billIndex: 4, stance: 'mixed', coalitionOpen: true, members: 4 },
+  { orgName: 'במקום – מתכננים למען זכויות', orgIcon: '🏗️', billIndex: 0, stance: 'for', coalitionOpen: true, members: 6 },
 ];
 
 export const DEMO_ORG_POSITION = {

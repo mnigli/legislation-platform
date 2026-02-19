@@ -1,4 +1,5 @@
 import { Router, Request, Response } from 'express';
+import rateLimit from 'express-rate-limit';
 import { prisma } from '../utils/prisma';
 import { authenticateToken, optionalAuth, requireRole } from '../middleware/auth';
 import { validate } from '../middleware/validation';
@@ -7,6 +8,12 @@ import { Prisma } from '@prisma/client';
 import { generateBillSummary } from '../services/ai/summarizer';
 
 const router = Router();
+
+const summarizeLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000, // 1 hour
+  max: 10, // 10 summarizations per hour per IP
+  message: { success: false, error: { code: 'RATE_LIMIT', message: 'יותר מדי בקשות סיכום, נסו שוב מאוחר יותר' } },
+});
 
 // GET /bills - List bills with filters
 router.get('/', optionalAuth, async (req: Request, res: Response) => {
@@ -240,7 +247,7 @@ router.get('/search', optionalAuth, async (req: Request, res: Response) => {
 });
 
 // POST /bills/:id/summarize - Generate AI summary for a bill
-router.post('/:id/summarize', async (req: Request, res: Response) => {
+router.post('/:id/summarize', authenticateToken, summarizeLimiter, async (req: Request, res: Response) => {
   try {
     const billId = req.params.id as string;
 
@@ -265,7 +272,7 @@ router.post('/:id/summarize', async (req: Request, res: Response) => {
     console.error('Summarize error:', error);
     res.status(500).json({
       success: false,
-      error: { code: 'SUMMARIZE_ERROR', message: error.message || 'שגיאה ביצירת תקציר' },
+      error: { code: 'SUMMARIZE_ERROR', message: 'שגיאה ביצירת תקציר' },
     });
   }
 });

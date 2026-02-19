@@ -21,11 +21,10 @@ export default function Footer() {
             </ul>
           </div>
           <div>
-            <h4 className="text-white font-medium mb-4">עקבו אחרינו</h4>
+            <h4 className="text-white font-medium mb-4">צרו קשר</h4>
             <ul className="space-y-2 text-sm">
-              <li><a href="#" className="hover:text-white transition-colors">טוויטר / X</a></li>
-              <li><a href="#" className="hover:text-white transition-colors">פייסבוק</a></li>
-              <li><a href="#" className="hover:text-white transition-colors">טלגרם</a></li>
+              <li><Link to="/about" className="hover:text-white transition-colors">אודות הפלטפורמה</Link></li>
+              <li><a href="mailto:contact@hukit.co.il" className="hover:text-white transition-colors">contact@hukit.co.il</a></li>
             </ul>
           </div>
         </div>

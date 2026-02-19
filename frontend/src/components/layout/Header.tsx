@@ -35,7 +35,7 @@ export default function Header() {
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder="חיפוש הצעות חוק..."
-                className="w-full bg-white/10 border border-white/20 rounded-lg px-4 py-2 pr-10 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-knesset-gold focus:bg-white/20"
+                className="w-full bg-white/10 border border-white/20 rounded-lg px-4 py-2 pl-10 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-knesset-gold focus:bg-white/20"
               />
               <FiSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-white/50" />
             </div>

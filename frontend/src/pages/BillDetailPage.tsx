@@ -16,7 +16,7 @@ export default function BillDetailPage() {
   const [tab, setTab] = useState<'summary' | 'impact' | 'fulltext' | 'suggestions' | 'comments'>('summary');
   const [copied, setCopied] = useState(false);
 
-  const { data, isLoading, error } = useQuery({
+  const { data, isLoading, error, refetch } = useQuery({
     queryKey: ['bill', id],
     queryFn: () => api.getBill(id!),
     enabled: !!id,
@@ -47,7 +47,21 @@ export default function BillDetailPage() {
     );
   }
 
-  if (error || !bill) {
+  if (error) {
+    return (
+      <div className="max-w-4xl mx-auto px-4 py-8 text-center">
+        <div className="card">
+          <p className="text-xl text-red-600 mb-4">שגיאה בטעינת הצעת החוק</p>
+          <div className="flex items-center justify-center gap-3">
+            <button onClick={() => refetch()} className="btn-primary">נסו שוב</button>
+            <Link to="/bills" className="text-gray-500 hover:text-gray-700">חזרה לרשימה</Link>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (!bill) {
     return (
       <div className="max-w-4xl mx-auto px-4 py-8 text-center">
         <div className="card">

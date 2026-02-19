@@ -38,7 +38,7 @@ function CommentCard({ comment, billId, depth = 0 }: { comment: Comment; billId:
   const roleLabel = comment.user.role === 'MK' ? 'ח"כ' : comment.user.role === 'ADMIN' ? 'מנהל' : null;
 
   return (
-    <div className={`${depth > 0 ? 'mr-8 border-r-2 border-gray-100 pr-4' : ''}`}>
+    <div className={`${depth > 0 ? 'ml-8 border-l-2 border-gray-100 pl-4' : ''}`}>
       <div className="py-3">
         <div className="flex items-center gap-2 mb-1">
           {comment.user.avatarUrl ? (

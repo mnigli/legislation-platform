@@ -5,18 +5,17 @@ import { api } from '../services/api';
 import WhatIsHukit from '../components/home/WhatIsHukit';
 import ExplainerVideo from '../components/home/ExplainerVideo';
 import DemographicQuestionnaire from '../components/questionnaire/DemographicQuestionnaire';
-import type { Bill } from '../types';
 
 export default function HomePage() {
-  const { data: latestRes } = useQuery({
-    queryKey: ['bills', 'homepage-latest'],
-    queryFn: () => api.getBills({ sort: 'newest', limit: '6' }),
+  const { data: statsRes, isError: statsError } = useQuery({
+    queryKey: ['bills', 'stats'],
+    queryFn: () => api.getBillStats(),
   });
 
-  const latestBills: Bill[] = latestRes?.data || [];
-  const totalBills = latestRes?.meta?.pagination?.total || 0;
-  const totalStars = latestBills.reduce((sum: number, b: Bill) => sum + b.starCount, 0);
-  const totalComments = latestBills.reduce((sum: number, b: Bill) => sum + b.commentCount, 0);
+  const stats = statsRes?.data;
+  const totalBills = stats?.totalBills || 0;
+  const totalStars = stats?.totalStars || 0;
+  const totalComments = stats?.totalComments || 0;
 
   return (
     <div>
@@ -48,7 +47,7 @@ export default function HomePage() {
               <FiTrendingUp className="text-primary-600" size={24} />
             </div>
             <div>
-              <p className="text-2xl font-bold">{totalBills || '...'}</p>
+              <p className="text-2xl font-bold">{statsError ? '—' : (totalBills || '...')}</p>
               <p className="text-gray-500 text-sm">הצעות חוק במערכת</p>
             </div>
           </div>
@@ -57,7 +56,7 @@ export default function HomePage() {
               <FiStar className="text-yellow-600" size={24} />
             </div>
             <div>
-              <p className="text-2xl font-bold">{totalStars || '...'}</p>
+              <p className="text-2xl font-bold">{statsError ? '—' : (totalStars || '...')}</p>
               <p className="text-gray-500 text-sm">דירוגים ניתנו</p>
             </div>
           </div>
@@ -66,7 +65,7 @@ export default function HomePage() {
               <FiUsers className="text-green-600" size={24} />
             </div>
             <div>
-              <p className="text-2xl font-bold">{totalComments || '...'}</p>
+              <p className="text-2xl font-bold">{statsError ? '—' : (totalComments || '...')}</p>
               <p className="text-gray-500 text-sm">תגובות והצעות</p>
             </div>
           </div>

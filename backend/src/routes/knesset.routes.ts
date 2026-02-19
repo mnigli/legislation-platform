@@ -1,10 +1,11 @@
 import { Router, Request, Response } from 'express';
 import { scrapeKnessetBills, getKnessetBillCount } from '../services/knesset/scraper';
+import { authenticateToken, requireRole } from '../middleware/auth';
 
 const router = Router();
 
 // POST /knesset/scrape - Fetch bills from Knesset OData API and save to DB
-router.post('/scrape', async (req: Request, res: Response) => {
+router.post('/scrape', authenticateToken, requireRole('ADMIN'), async (req: Request, res: Response) => {
   try {
     const {
       knessetNum = 25,

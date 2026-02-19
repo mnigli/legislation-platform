@@ -5,26 +5,6 @@ import { FiArrowRight, FiPlay, FiPause, FiVolume2, FiFileText, FiZap, FiSearch, 
 import { api } from '../services/api';
 import { BILL_STAGE_LABELS } from '../types';
 
-// ==================== DEMO DATA ====================
-
-const DEMO_RESEARCH = `## רקע
-הצעת חוק זו מתבססת על מגמה עולמית של הרחבת זכויות אזרחיות בתחום הנדון. מדינות כמו גרמניה, שוודיה וקנדה כבר אימצו חקיקה דומה בשנים האחרונות.
-
-## ממצאים עיקריים
-• מחקר של מכון ברוקינגס (2024) מצא שחקיקה דומה הובילה לשיפור של 23% במדדים הרלוונטיים
-• הערכת עלות-תועלת: ההשקעה הראשונית מוערכת ב-50 מיליון ₪, עם החזר צפוי תוך 3-5 שנים
-• סקר דעת קהל: 67% מהציבור תומכים ברפורמה
-
-## השוואה בינלאומית
-ישראל מדורגת במקום 28 מתוך 38 מדינות OECD ביישום חקיקה דומה. אימוץ ההצעה צפוי לקדם את ישראל ל-15 המובילות.`;
-
-const DEMO_IMPACT_GROUPS = [
-  { group: 'משפחות צעירות', impact: 'positive' as const, desc: 'הקלה כלכלית ישירה ושיפור איכות חיים' },
-  { group: 'בעלי עסקים קטנים', impact: 'positive' as const, desc: 'הפחתת בירוקרטיה ופתיחת הזדמנויות חדשות' },
-  { group: 'רשויות מקומיות', impact: 'positive' as const, desc: 'תקציב ייעודי ליישום מקומי' },
-  { group: 'חברות גדולות', impact: 'negative' as const, desc: 'עליית עלויות רגולציה צפויה' },
-];
-
 // ==================== TTS HOOK ====================
 
 function useTextToSpeech(text: string) {
@@ -275,16 +255,9 @@ export default function BillExplorePage() {
                 ))}
               </>
             ) : (
-              <div className="space-y-3">
-                {DEMO_IMPACT_GROUPS.map((g, i) => (
-                  <div key={i} className={`bg-white/10 backdrop-blur-sm rounded-xl p-3 flex items-start gap-3`}>
-                    <span className="text-lg mt-0.5">{g.impact === 'positive' ? '✅' : '⚠️'}</span>
-                    <div>
-                      <p className="text-white font-bold text-sm">{g.group}</p>
-                      <p className="text-white/60 text-xs">{g.desc}</p>
-                    </div>
-                  </div>
-                ))}
+              <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-5 text-center">
+                <p className="text-white/70 text-sm">ניתוח השפעה יהיה זמין בקרוב עבור הצעת חוק זו.</p>
+                <p className="text-white/40 text-xs mt-2">הניתוח נוצר באמצעות בינה מלאכותית ומתעדכן אוטומטית.</p>
               </div>
             )}
           </div>
@@ -297,22 +270,10 @@ export default function BillExplorePage() {
           subtitle="השוואה בינלאומית ונתונים"
           gradient="from-emerald-800 via-green-800 to-teal-900"
         >
-          <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-5">
-            <div className="text-white/90 text-sm leading-relaxed space-y-3">
-              {DEMO_RESEARCH
-                .replace(/##?\s*/g, '')
-                .split('\n')
-                .filter(line => line.trim())
-                .slice(0, 10)
-                .map((line, i) => (
-                  <p key={i} className={line.startsWith('•') ? 'pr-3 text-white/70' : 'font-bold text-white/90'}>
-                    {line}
-                  </p>
-                ))}
-            </div>
-            <div className="mt-4 bg-white/5 rounded-xl px-3 py-2 text-[10px] text-white/40 text-center">
-              📋 דמו — בגרסה הבאה: מחקר AI מותאם אישית לכל הצעת חוק
-            </div>
+          <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-5 text-center">
+            <FiSearch size={32} className="text-white/30 mx-auto mb-3" />
+            <p className="text-white/70 text-sm">מחקר עומק והשוואה בינלאומית יהיו זמינים בקרוב.</p>
+            <p className="text-white/40 text-xs mt-2">המערכת תנתח רקע, נתונים ומגמות עולמיות הקשורות להצעת החוק.</p>
           </div>
         </ExploreCard>
 
@@ -357,9 +318,6 @@ export default function BillExplorePage() {
               )}
             </p>
 
-            <div className="mt-4 bg-white/5 rounded-xl px-3 py-2 text-[10px] text-white/40 text-center">
-              🎙️ דמו — בגרסה הבאה: קריינות מקצועית עם AI
-            </div>
           </div>
         </ExploreCard>
       </div>
