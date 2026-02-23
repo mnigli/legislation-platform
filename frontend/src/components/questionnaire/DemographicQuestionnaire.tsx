@@ -12,7 +12,6 @@ import type { QuizAnswers } from '../../lib/demographicMapping';
 const EMPTY_ANSWERS: QuizAnswers = {
   interests: [],
   lifeSituation: [],
-  readingStyle: '',
 };
 
 export default function DemographicQuestionnaire() {
@@ -45,8 +44,6 @@ export default function DemographicQuestionnaire() {
       newAnswers.interests = value as string[];
     } else if (qId === 'lifeSituation') {
       newAnswers.lifeSituation = value as string[];
-    } else if (qId === 'readingStyle') {
-      newAnswers.readingStyle = value as string;
     }
 
     setAnswers(newAnswers);
@@ -75,18 +72,14 @@ export default function DemographicQuestionnaire() {
   const currentValue = question
     ? question.id === 'interests'
       ? answers.interests
-      : question.id === 'lifeSituation'
-      ? answers.lifeSituation
-      : answers.readingStyle
-    : '';
+      : answers.lifeSituation
+    : [];
 
   // Check if current step has a valid selection
   const canAdvance = question
     ? question.id === 'interests'
       ? answers.interests.length > 0
-      : question.id === 'lifeSituation'
-      ? answers.lifeSituation.length > 0
-      : !!answers.readingStyle
+      : answers.lifeSituation.length > 0
     : false;
 
   // If already completed, show a link to results instead of the quiz
@@ -137,7 +130,7 @@ export default function DemographicQuestionnaire() {
           </h2>
         </div>
         <p className="text-lg text-gray-500 max-w-2xl mx-auto">
-          6 קליקים וזה הכל
+          2 שאלות וזה הכל
         </p>
       </div>
 

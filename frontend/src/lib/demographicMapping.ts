@@ -3,11 +3,10 @@
 export interface QuizAnswers {
   interests: string[];      // up to 3
   lifeSituation: string[];  // up to 2
-  readingStyle: string;     // single choice
 }
 
 export interface QuizQuestion {
-  id: keyof QuizAnswers;
+  id: string;
   label: string;
   subtitle: string;
   icon: string;
@@ -52,18 +51,6 @@ export const QUIZ_QUESTIONS: QuizQuestion[] = [
       { value: 'reservist', label: 'מילואים פעיל', icon: '🎖️' },
       { value: 'chronic_caregiver', label: 'מטופל כרוני / בן משפחה מטפל', icon: '❤️‍🩹' },
       { value: 'other', label: 'אחר', icon: '✨' },
-    ],
-  },
-  {
-    id: 'readingStyle',
-    label: 'איך תרצה לקרוא הצעות חוק?',
-    subtitle: 'בחר אחד',
-    icon: '📖',
-    maxSelect: 1,
-    options: [
-      { value: 'short', label: 'תקציר קצר מאוד', icon: '⚡' },
-      { value: 'detailed', label: 'תקציר פשוט ומפורט', icon: '📝' },
-      { value: 'full', label: 'טקסט מלא עם סעיפים', icon: '📄' },
     ],
   },
 ];
@@ -120,11 +107,6 @@ export const LIFE_LABELS: Record<string, string> = {
   other: 'אחר',
 };
 
-export const READING_LABELS: Record<string, string> = {
-  short: 'תקציר קצר מאוד',
-  detailed: 'תקציר פשוט ומפורט',
-  full: 'טקסט מלא עם סעיפים',
-};
 
 // ==================== "WHY HERE" MAPPING ====================
 
@@ -220,8 +202,8 @@ export function loadQuizAnswers(): QuizAnswers | null {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (raw) {
       const parsed = JSON.parse(raw);
-      // Validate new format
-      if (Array.isArray(parsed.interests) && Array.isArray(parsed.lifeSituation) && parsed.readingStyle) {
+      // Validate format (interests + lifeSituation are required)
+      if (Array.isArray(parsed.interests) && Array.isArray(parsed.lifeSituation)) {
         return parsed;
       }
     }

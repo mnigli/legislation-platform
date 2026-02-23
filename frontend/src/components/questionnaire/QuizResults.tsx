@@ -9,7 +9,7 @@ import { api } from '../../services/api';
 import type { QuizAnswers } from '../../lib/demographicMapping';
 import {
   buildBillQueries, buildTrendingQuery, buildUpcomingQuery,
-  getWhyHereReason, INTEREST_LABELS, LIFE_LABELS, READING_LABELS,
+  getWhyHereReason, INTEREST_LABELS, LIFE_LABELS,
 } from '../../lib/demographicMapping';
 import { BILL_STAGE_LABELS } from '../../types';
 import type { Bill } from '../../types';
@@ -383,15 +383,6 @@ export default function QuizResults({ answers, onRetake }: QuizResultsProps) {
             </div>
           )}
 
-          {/* Reading style */}
-          {answers.readingStyle && (
-            <div>
-              <span className="text-xs text-gray-400 font-medium mb-1 block">סגנון קריאה</span>
-              <span className="bg-green-50 text-green-700 px-3 py-1 rounded-full text-sm font-bold">
-                {READING_LABELS[answers.readingStyle] || answers.readingStyle}
-              </span>
-            </div>
-          )}
         </div>
 
         {/* CTA row */}

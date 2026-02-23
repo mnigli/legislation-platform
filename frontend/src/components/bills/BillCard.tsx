@@ -7,6 +7,7 @@ import { useNavigate } from 'react-router-dom';
 import { useMutation } from '@tanstack/react-query';
 import { api } from '../../services/api';
 import toast from 'react-hot-toast';
+import { extractBillHeadline, extractBillSubtitle } from '../../lib/billDisplay';
 
 interface Props {
   bill: Bill;
@@ -18,21 +19,14 @@ export default function BillCard({ bill }: Props) {
   const { user } = useAuthStore();
   const navigate = useNavigate();
 
-  // Get a clean summary text
+  // Attractive headline + explanatory subtitle
+  const headline = extractBillHeadline(bill.titleHe, bill.summaryHe);
+  const subtitle = extractBillSubtitle(bill.titleHe, bill.summaryHe);
+
+  // Get a clean summary text for the expanded view
   const rawSummary = bill.summaryHe
     ? bill.summaryHe.replace(/^##\s.*$/gm, '').replace(/^-\s/gm, '').replace(/\*\*/g, '').trim()
     : '';
-
-  // Inline version for the card (single line, no newlines)
-  const summaryInline = rawSummary.replace(/\n+/g, ' ').trim();
-
-  const shortSummary = summaryInline.length > 180
-    ? summaryInline.slice(0, 180) + '...'
-    : summaryInline;
-
-  // Friendly fallback when no AI summary
-  const displaySummary = summaryInline
-    || `הצעת חוק זו עוסקת ב${bill.titleHe.includes('תיקון') ? 'תיקון חקיקה קיימת' : 'הסדרה חדשה'} שמשפיעה על חיי היומיום.`;
 
   const fullSummary = rawSummary;
 
@@ -68,13 +62,13 @@ export default function BillCard({ bill }: Props) {
       >
         <div className="flex items-start justify-between gap-3">
           <div className="flex-1 min-w-0">
-            {/* Summary is the main content - readable and accessible */}
-            <p className="text-gray-800 text-sm md:text-base leading-relaxed mb-2">
-              {expanded ? fullSummary || displaySummary : shortSummary || displaySummary}
-            </p>
-            {/* Knesset title - small, secondary */}
-            <p className="text-xs text-gray-400 line-clamp-1">
-              {bill.titleHe}
+            {/* Attractive headline */}
+            <h3 className="text-gray-900 font-bold text-sm md:text-base mb-1 leading-snug">
+              {headline}
+            </h3>
+            {/* Explanatory subtitle */}
+            <p className="text-gray-500 text-xs md:text-sm leading-relaxed line-clamp-2">
+              {subtitle}
             </p>
           </div>
           <div className="flex flex-col items-center gap-2 shrink-0" onClick={(e) => e.stopPropagation()}>

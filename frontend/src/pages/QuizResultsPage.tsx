@@ -3,7 +3,7 @@ import { useQueries, useQuery } from '@tanstack/react-query';
 import { Link, useNavigate } from 'react-router-dom';
 import {
   FiStar, FiClock, FiTrendingUp, FiEdit2,
-  FiArrowLeft, FiMessageCircle, FiEye, FiChevronDown, FiChevronUp, FiEdit3
+  FiArrowLeft, FiChevronDown, FiChevronUp, FiEdit3
 } from 'react-icons/fi';
 import { api } from '../services/api';
 import {
@@ -17,21 +17,7 @@ import RatingStars from '../components/bills/RatingStars';
 import { useAuthStore } from '../stores/authStore';
 import { useMutation } from '@tanstack/react-query';
 import toast from 'react-hot-toast';
-
-// ==================== Helper ====================
-
-function extractSnippet(summaryHe: string | null, titleHe: string): string {
-  if (summaryHe) {
-    const clean = summaryHe
-      .replace(/##?\s*.+/g, '')
-      .replace(/[-*]/g, '')
-      .replace(/\*\*/g, '')
-      .replace(/\n+/g, ' ')
-      .trim();
-    return clean.length > 180 ? clean.substring(0, 180) + '...' : clean;
-  }
-  return `הצעת חוק זו עוסקת ב${titleHe.includes('תיקון') ? 'תיקון חקיקה' : 'הסדרה חדשה'} שמשפיעה על חיי היומיום שלנו.`;
-}
+import { extractBillHeadline, extractBillSubtitle } from '../lib/billDisplay';
 
 // ==================== Bill Result Card ====================
 
@@ -41,7 +27,8 @@ function BillResultCard({ bill, answers, badge }: { bill: Bill; answers: QuizAns
   const { user } = useAuthStore();
   const navigate = useNavigate();
   const whyHere = getWhyHereReason(bill.categories, answers);
-  const snippet = extractSnippet(bill.summaryHe, bill.titleHe);
+  const headline = extractBillHeadline(bill.titleHe, bill.summaryHe);
+  const subtitle = extractBillSubtitle(bill.titleHe, bill.summaryHe);
 
   // Full cleaned summary
   const fullSummary = bill.summaryHe
@@ -86,13 +73,13 @@ function BillResultCard({ bill, answers, badge }: { bill: Bill; answers: QuizAns
 
         <div className="flex items-start justify-between gap-3">
           <div className="flex-1 min-w-0">
-            {/* Summary as the main content - not the Knesset title */}
-            <p className="text-gray-800 text-sm md:text-base leading-relaxed mb-2">
-              {snippet}
-            </p>
-            {/* Small Knesset title */}
-            <p className="text-xs text-gray-400 line-clamp-1">
-              {bill.titleHe}
+            {/* Attractive headline */}
+            <h3 className="text-gray-900 font-bold text-sm md:text-base mb-1 leading-snug">
+              {headline}
+            </h3>
+            {/* Explanatory subtitle */}
+            <p className="text-gray-500 text-xs md:text-sm leading-relaxed line-clamp-2">
+              {subtitle}
             </p>
           </div>
           <div className="flex flex-col items-center gap-2 shrink-0" onClick={(e) => e.stopPropagation()}>
