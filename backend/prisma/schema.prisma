@@ -86,6 +86,7 @@ model User {
   comments               Comment[]
   commentVotes           CommentVote[]
   suggestionVotes        SuggestionVote[]
+  statementVotes         StatementVote[]
   notifications          Notification[]
   userBadges             UserBadge[]
   newsletterSubscription NewsletterSubscription?
@@ -137,6 +138,14 @@ model Bill {
   // Metadata
   knessetSession Int? @map("knesset_session")
 
+  // vTaiwan fields (AI-generated)
+  citizenTitle      String? @map("citizen_title")          // כותרת אזרחית פשוטה
+  stakeholders      Json?   @default("[]")                  // בעלי עניין מרכזיים
+  controversyPoints Json?   @map("controversy_points") @default("[]")  // נקודות מחלוקת
+
+  // Featured (reached star threshold)
+  isFeatured Boolean @default(false) @map("is_featured")
+
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
@@ -144,6 +153,7 @@ model Bill {
   stars       BillStar[]
   suggestions Suggestion[]
   comments    Comment[]
+  statements  BillStatement[]
 
   @@index([currentStage])
   @@index([status])
@@ -307,6 +317,48 @@ model NewsletterSubscription {
 
   @@map("newsletter_subscriptions")
 }
+
+// ==================== vTaiwan Discussion ====================
+
+model BillStatement {
+  id          String @id @default(uuid())
+  billId      String @map("bill_id")
+
+  content      String @db.Text  // שאלת הדיון
+  order        Int    @default(0)
+
+  // Denormalized vote counts for performance
+  agreeCount    Int @default(0) @map("agree_count")
+  neutralCount  Int @default(0) @map("neutral_count")
+  disagreeCount Int @default(0) @map("disagree_count")
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  bill  Bill             @relation(fields: [billId], references: [id], onDelete: Cascade)
+  votes StatementVote[]
+
+  @@index([billId])
+  @@map("bill_statements")
+}
+
+model StatementVote {
+  id          String @id @default(uuid())
+  statementId String @map("statement_id")
+  userId      String @map("user_id")
+
+  // 1 = מסכים, 0 = ניטרלי, -1 = לא מסכים
+  value Int
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  statement BillStatement @relation(fields: [statementId], references: [id], onDelete: Cascade)
+  user      User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([statementId, userId])
+  @@map("statement_votes")
+}
+
+// ==================== Activity Log ====================
 
 model ActivityLog {
   id         String  @id @default(uuid())

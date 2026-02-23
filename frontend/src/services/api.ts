@@ -169,6 +169,22 @@ class ApiClient {
   async getDashboardStats() {
     return this.request<any>('/dashboard/stats');
   }
+
+  // vTaiwan Statements
+  async getBillStatements(billId: string) {
+    return this.request<any>(`/bills/${billId}/statements`);
+  }
+
+  async generateBillStatements(billId: string) {
+    return this.request<any>(`/bills/${billId}/statements/generate`, { method: 'POST' });
+  }
+
+  async voteStatement(statementId: string, value: number) {
+    return this.request<any>(`/bills/statements/${statementId}/vote`, {
+      method: 'POST',
+      body: JSON.stringify({ value }),
+    });
+  }
 }
 
 export const api = new ApiClient();

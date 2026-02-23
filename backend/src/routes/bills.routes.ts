@@ -5,7 +5,7 @@ import { authenticateToken, optionalAuth, requireRole } from '../middleware/auth
 import { validate } from '../middleware/validation';
 import { z } from 'zod';
 import { Prisma } from '@prisma/client';
-import { generateBillSummary } from '../services/ai/summarizer';
+import { generateBillSummary, generateBillStatements } from '../services/ai/summarizer';
 
 const router = Router();
 
@@ -274,6 +274,153 @@ router.post('/:id/summarize', authenticateToken, summarizeLimiter, async (req: R
       success: false,
       error: { code: 'SUMMARIZE_ERROR', message: 'שגיאה ביצירת תקציר' },
     });
+  }
+});
+
+// ==================== vTaiwan Statements ====================
+
+// GET /bills/:id/statements - Get discussion statements for a bill
+router.get('/:id/statements', optionalAuth, async (req: Request, res: Response) => {
+  try {
+    const billId = req.params.id as string;
+
+    const statements = await prisma.billStatement.findMany({
+      where: { billId },
+      orderBy: { order: 'asc' },
+      include: req.user ? {
+        votes: { where: { userId: req.user.id }, select: { value: true } },
+      } : undefined,
+    });
+
+    const result = statements.map((s) => {
+      const { votes, ...rest } = s as any;
+      return {
+        ...rest,
+        userVote: votes && votes.length > 0 ? votes[0].value : null,
+      };
+    });
+
+    res.json({ success: true, data: result });
+  } catch (error) {
+    console.error('Get statements error:', error);
+    res.status(500).json({ success: false, error: { code: 'INTERNAL_ERROR', message: 'שגיאה בטעינת שאלות דיון' } });
+  }
+});
+
+// POST /bills/:id/statements/generate - AI generates statements (ADMIN only)
+router.post('/:id/statements/generate', authenticateToken, requireRole('ADMIN'), async (req: Request, res: Response) => {
+  try {
+    const billId = req.params.id as string;
+
+    const bill = await prisma.bill.findUnique({ where: { id: billId } });
+    if (!bill) {
+      res.status(404).json({ success: false, error: { code: 'NOT_FOUND', message: 'הצעת חוק לא נמצאה' } });
+      return;
+    }
+
+    console.log(`Generating vTaiwan statements for: ${bill.titleHe}`);
+    const generated = await generateBillStatements(billId);
+
+    // Save citizen title + metadata to Bill
+    await prisma.bill.update({
+      where: { id: billId },
+      data: {
+        citizenTitle: generated.citizenTitle,
+        stakeholders: generated.stakeholders,
+        controversyPoints: generated.controversyPoints,
+      },
+    });
+
+    // Delete existing statements and recreate
+    await prisma.billStatement.deleteMany({ where: { billId } });
+    const statementsData = generated.statements.map((content, i) => ({
+      billId,
+      content,
+      order: i,
+    }));
+    await prisma.billStatement.createMany({ data: statementsData });
+
+    const statements = await prisma.billStatement.findMany({
+      where: { billId },
+      orderBy: { order: 'asc' },
+    });
+
+    res.json({
+      success: true,
+      data: {
+        citizenTitle: generated.citizenTitle,
+        stakeholders: generated.stakeholders,
+        controversyPoints: generated.controversyPoints,
+        statements,
+      },
+    });
+  } catch (error) {
+    console.error('Generate statements error:', error);
+    res.status(500).json({ success: false, error: { code: 'INTERNAL_ERROR', message: 'שגיאה ביצירת שאלות דיון' } });
+  }
+});
+
+// POST /statements/:statementId/vote - Vote on a statement
+router.post('/statements/:statementId/vote', authenticateToken, async (req: Request, res: Response) => {
+  try {
+    const statementId = req.params.statementId as string;
+    const userId = req.user!.id;
+    const value = parseInt(req.body.value);
+
+    if (![-1, 0, 1].includes(value)) {
+      res.status(400).json({ success: false, error: { code: 'VALIDATION_ERROR', message: 'ערך הצבעה לא חוקי (1, 0, -1)' } });
+      return;
+    }
+
+    const statement = await prisma.billStatement.findUnique({ where: { id: statementId } });
+    if (!statement) {
+      res.status(404).json({ success: false, error: { code: 'NOT_FOUND', message: 'שאלת דיון לא נמצאה' } });
+      return;
+    }
+
+    const existing = await prisma.statementVote.findUnique({
+      where: { statementId_userId: { statementId, userId } },
+    });
+
+    await prisma.$transaction(async (tx) => {
+      if (existing) {
+        // Update existing vote — adjust counts
+        const oldValue = existing.value;
+        await tx.statementVote.update({
+          where: { statementId_userId: { statementId, userId } },
+          data: { value },
+        });
+        // Decrement old count, increment new count
+        const decrements: any = {};
+        const increments: any = {};
+        if (oldValue === 1) decrements.agreeCount = { decrement: 1 };
+        else if (oldValue === 0) decrements.neutralCount = { decrement: 1 };
+        else if (oldValue === -1) decrements.disagreeCount = { decrement: 1 };
+        if (value === 1) increments.agreeCount = { increment: 1 };
+        else if (value === 0) increments.neutralCount = { increment: 1 };
+        else if (value === -1) increments.disagreeCount = { increment: 1 };
+        await tx.billStatement.update({
+          where: { id: statementId },
+          data: { ...decrements, ...increments },
+        });
+      } else {
+        // New vote
+        await tx.statementVote.create({ data: { statementId, userId, value } });
+        const increment: any = {};
+        if (value === 1) increment.agreeCount = { increment: 1 };
+        else if (value === 0) increment.neutralCount = { increment: 1 };
+        else if (value === -1) increment.disagreeCount = { increment: 1 };
+        await tx.billStatement.update({ where: { id: statementId }, data: increment });
+        // Award points for participation
+        await tx.user.update({ where: { id: userId }, data: { points: { increment: 2 } } });
+      }
+    });
+
+    const updated = await prisma.billStatement.findUnique({ where: { id: statementId } });
+    res.json({ success: true, data: { ...updated, userVote: value } });
+  } catch (error) {
+    console.error('Statement vote error:', error);
+    res.status(500).json({ success: false, error: { code: 'INTERNAL_ERROR', message: 'שגיאה בהצבעה' } });
   }
 });
 

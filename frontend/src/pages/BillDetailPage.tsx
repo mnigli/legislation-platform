@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import { FiExternalLink, FiShare2, FiEye, FiMessageSquare, FiCopy, FiCheck } from 'react-icons/fi';
+import { FiExternalLink, FiShare2, FiEye, FiMessageSquare, FiCheck } from 'react-icons/fi';
 import ReactMarkdown from 'react-markdown';
 import { api } from '../services/api';
 import StarButton from '../components/bills/StarButton';
@@ -9,11 +9,12 @@ import BillStageTracker from '../components/bills/BillStageTracker';
 import CommentSection from '../components/comments/CommentSection';
 import SuggestionSection from '../components/suggestions/SuggestionSection';
 import ImpactAnalysis from '../components/bills/ImpactAnalysis';
+import StatementCard from '../components/bills/StatementCard';
 import { BILL_STAGE_LABELS, type Bill } from '../types';
 
 export default function BillDetailPage() {
   const { id } = useParams<{ id: string }>();
-  const [tab, setTab] = useState<'summary' | 'impact' | 'fulltext' | 'suggestions' | 'comments'>('summary');
+  const [tab, setTab] = useState<'summary' | 'discussion' | 'impact' | 'fulltext' | 'suggestions' | 'comments'>('summary');
   const [copied, setCopied] = useState(false);
 
   const { data, isLoading, error, refetch } = useQuery({
@@ -22,7 +23,14 @@ export default function BillDetailPage() {
     enabled: !!id,
   });
 
+  const { data: statementsData } = useQuery({
+    queryKey: ['statements', id],
+    queryFn: () => api.getBillStatements(id!),
+    enabled: !!id,
+  });
+
   const bill: Bill | undefined = data?.data;
+  const statements: any[] = statementsData?.data || [];
 
   const handleShare = async () => {
     const url = window.location.href;
@@ -133,9 +141,10 @@ export default function BillDetailPage() {
       <BillStageTracker currentStage={bill.currentStage} />
 
       {/* Tab Navigation */}
-      <div className="flex border-b border-gray-200">
+      <div className="flex border-b border-gray-200 overflow-x-auto">
         {[
           { key: 'summary', label: 'תקציר AI' },
+          { key: 'discussion', label: `דיון ציבורי 🗳️${statements.length > 0 ? ` (${statements.length})` : ''}` },
           { key: 'impact', label: 'ניתוח השפעה' },
           { key: 'fulltext', label: 'טקסט מלא' },
           { key: 'suggestions', label: `הצעות לשיפור` },
@@ -197,6 +206,63 @@ export default function BillDetailPage() {
           <div className="bg-gray-50 rounded-lg p-6 whitespace-pre-wrap text-sm leading-relaxed font-mono">
             {bill.fullTextHe}
           </div>
+        </div>
+      )}
+
+      {tab === 'discussion' && (
+        <div className="space-y-4">
+          {/* vTaiwan citizen title */}
+          {(bill as any).citizenTitle && (
+            <div className="bg-teal-50 border border-teal-200 rounded-2xl p-5" dir="rtl">
+              <p className="text-xs text-teal-600 font-bold uppercase mb-1">שאלה אזרחית</p>
+              <h2 className="text-xl font-bold text-teal-900">{(bill as any).citizenTitle}</h2>
+            </div>
+          )}
+
+          {/* Controversy points */}
+          {(bill as any).controversyPoints && (bill as any).controversyPoints.length > 0 && (
+            <div className="bg-amber-50 border border-amber-100 rounded-2xl p-5" dir="rtl">
+              <h3 className="text-sm font-bold text-amber-800 mb-3">על מה מתווכחים כאן?</h3>
+              <ul className="space-y-1.5">
+                {(bill as any).controversyPoints.map((point: string, i: number) => (
+                  <li key={i} className="flex items-start gap-2 text-sm text-amber-700">
+                    <span className="mt-0.5 text-amber-400 flex-shrink-0">•</span>
+                    {point}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+
+          {/* Statements */}
+          {statements.length > 0 ? (
+            <div className="space-y-3">
+              <p className="text-sm text-gray-500 text-right">הצביעו על כל שאלה — הציבור יראה את התוצאות המצטברות</p>
+              {statements.map((s: any) => (
+                <StatementCard key={s.id} statement={s} billId={bill.id} />
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-10 text-gray-400">
+              <p className="text-4xl mb-3">🗳️</p>
+              <p className="font-medium">שאלות הדיון הציבורי עדיין לא נוצרו להצעה זו</p>
+              <p className="text-sm mt-1">הן ייווצרו אוטומטית בקרוב על ידי AI</p>
+            </div>
+          )}
+
+          {/* Stakeholders */}
+          {(bill as any).stakeholders && (bill as any).stakeholders.length > 0 && (
+            <div className="bg-gray-50 rounded-2xl p-5" dir="rtl">
+              <h3 className="text-sm font-bold text-gray-700 mb-3">מי בעלי העניין המרכזיים?</h3>
+              <div className="flex flex-wrap gap-2">
+                {(bill as any).stakeholders.map((s: string, i: number) => (
+                  <span key={i} className="bg-white border border-gray-200 text-gray-700 text-xs px-3 py-1.5 rounded-full font-medium">
+                    {s}
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       )}
 
