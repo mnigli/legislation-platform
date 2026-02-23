@@ -13,6 +13,7 @@ import AboutPage from './pages/AboutPage';
 import KnessetImportPage from './pages/KnessetImportPage';
 import DashboardPage from './pages/DashboardPage';
 import BillExplorePage from './pages/BillExplorePage';
+import ArenaPage from './pages/ArenaPage';
 import OrgsHomePage from './pages/portals/OrgsHomePage';
 import OrgsBillPage from './pages/portals/OrgsBillPage';
 import MediaHomePage from './pages/portals/MediaHomePage';
@@ -42,6 +43,7 @@ export default function App() {
           <Route path="/bills" element={<BillsPage />} />
           <Route path="/bill/:id" element={<BillDetailPage />} />
           <Route path="/bill/:id/explore" element={<BillExplorePage />} />
+          <Route path="/arena" element={<ArenaPage />} />
           <Route path="/search" element={<SearchPage />} />
           <Route path="/leaderboard" element={<LeaderboardPage />} />
           <Route path="/profile/:id" element={<ProfilePage />} />

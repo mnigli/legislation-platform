@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
-import { FiTrendingUp, FiUsers, FiStar } from 'react-icons/fi';
+import { FiTrendingUp, FiUsers, FiStar, FiArrowLeft } from 'react-icons/fi';
 import { api } from '../services/api';
 import WhatIsHukit from '../components/home/WhatIsHukit';
 import ExplainerVideo from '../components/home/ExplainerVideo';
@@ -20,20 +20,22 @@ export default function HomePage() {
   return (
     <div>
       {/* Hero */}
-      <section className="bg-gradient-to-bl from-knesset-blue to-blue-900 text-white py-20">
+      <section className="bg-gradient-to-bl from-knesset-blue to-blue-900 text-white py-16 md:py-20">
         <div className="max-w-7xl mx-auto px-4 text-center">
-          <h1 className="text-4xl md:text-6xl font-extrabold mb-6">
-            <span className="text-knesset-gold">חוקית</span> - גיטהב של החקיקה
+          <h1 className="text-3xl md:text-6xl font-extrabold mb-4 md:mb-6">
+            <span className="text-knesset-gold">חוקית</span> — גיטהב של החקיקה
           </h1>
-          <p className="text-xl md:text-2xl text-blue-200 mb-8 max-w-3xl mx-auto">
+          <p className="text-lg md:text-2xl text-blue-200 mb-8 max-w-3xl mx-auto leading-relaxed">
             הצעות חוק בשפה שכולם מבינים. דרגו, הציעו שיפורים והשפיעו על החקיקה שמעצבת את חייכם.
           </p>
-          <div className="flex items-center justify-center gap-4 flex-wrap">
-            <Link to="/bills" className="bg-knesset-gold text-knesset-blue px-8 py-3 rounded-xl font-bold text-lg hover:bg-yellow-400 transition-colors">
-              צפו בהצעות חוק
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+            <Link to="/bills" className="w-full sm:w-auto bg-knesset-gold text-knesset-blue px-8 py-3.5 rounded-xl font-bold text-lg hover:bg-yellow-400 transition-colors flex items-center justify-center gap-2">
+              📋 הצעות חוק
+              <FiArrowLeft size={18} />
             </Link>
-            <Link to="/about" className="border-2 border-white/30 px-8 py-3 rounded-xl font-medium text-lg hover:bg-white/10 transition-colors">
-              איך זה עובד?
+            <Link to="/arena" className="w-full sm:w-auto border-2 border-knesset-gold/60 text-knesset-gold px-8 py-3.5 rounded-xl font-bold text-lg hover:bg-knesset-gold/10 transition-colors flex items-center justify-center gap-2">
+              🏟️ זירת דיונים
+              <FiArrowLeft size={18} />
             </Link>
           </div>
         </div>
@@ -73,12 +75,12 @@ export default function HomePage() {
       </section>
 
       {/* What is Hukit - Explainer Video */}
-      <section className="max-w-7xl mx-auto px-4 py-16">
+      <section className="max-w-7xl mx-auto px-4 py-12 md:py-16">
         <div className="text-center mb-8">
-          <h2 className="text-3xl md:text-4xl font-black text-gray-900 mb-3">
+          <h2 className="text-2xl md:text-4xl font-black text-gray-900 mb-3">
             🎬 מה זה <span className="text-knesset-blue">חוקית</span>?
           </h2>
-          <p className="text-lg text-gray-500 max-w-2xl mx-auto">
+          <p className="text-base md:text-lg text-gray-500 max-w-2xl mx-auto">
             פלטפורמה שהופכת את החקיקה הישראלית לנגישה, שקופה ומשתפת
           </p>
         </div>
@@ -86,12 +88,12 @@ export default function HomePage() {
       </section>
 
       {/* Legislation Simulator */}
-      <section className="max-w-7xl mx-auto px-4 pb-16">
+      <section className="max-w-7xl mx-auto px-4 pb-12 md:pb-16">
         <div className="text-center mb-8">
-          <h2 className="text-3xl md:text-4xl font-black text-gray-900 mb-3">
+          <h2 className="text-2xl md:text-4xl font-black text-gray-900 mb-3">
             ⚡ סימולטור: מסע הצעת חוק בכנסת
           </h2>
-          <p className="text-lg text-gray-500 max-w-2xl mx-auto">
+          <p className="text-base md:text-lg text-gray-500 max-w-2xl mx-auto">
             178 ימים, 8 שלבים, הצבעה אחת — צפו בתהליך החקיקה המלא
           </p>
         </div>

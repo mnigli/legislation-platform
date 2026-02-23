@@ -40,17 +40,24 @@ const SLIDES: Slide[] = [
   },
   {
     emoji: '⭐',
-    title: 'דרגו, הגיבו, והציעו שיפורים',
-    body: 'תנו כוכבים להצעות שחשובות לכם.\nכתבו תגובות והציעו שיפורים לנוסח החוק.\nכל קול נשמע.',
+    title: 'שלב 1: דרגו והציעו שיפורים',
+    body: 'קראו תקצירים של הצעות חוק בשפה פשוטה.\nדרגו מ-1 עד 5 כוכבים והציעו שיפורים לנוסח.\nהצעות עם דירוג גבוה עולות לזירת הדיונים.',
     bg: 'from-amber-900 via-orange-800 to-yellow-900',
     accent: 'text-amber-300',
   },
   {
-    emoji: '📊',
-    title: 'דשבורדים עם נתוני אמת',
-    body: 'כמה זמן לוקח לחוק לעבור? מי שיאני החקיקה? איך ישראל משתווה לעולם?\nהכל שקוף, הכל פתוח, הכל מבוסס נתונים אמיתיים.',
-    bg: 'from-emerald-900 via-teal-800 to-cyan-900',
-    accent: 'text-emerald-300',
+    emoji: '🏟️',
+    title: 'שלב 2: זירת הדיונים',
+    body: 'הצעות חוק חשובות מגיעות לזירת הדיונים.\nשם תמצאו ניתוח מעמיק: נקודות מחלוקת, בעלי עניין, ומה פתוח לשינוי.\nהצביעו על שאלות מפתח וקבעו את העמדה הציבורית.',
+    bg: 'from-teal-900 via-cyan-800 to-blue-900',
+    accent: 'text-cyan-300',
+  },
+  {
+    emoji: '🗳️',
+    title: 'הצבעה ציבורית על שאלות מפתח',
+    body: 'בזירת הדיונים, כל שאלה נפתחת להצבעה: מסכים, ניטרלי, או לא מסכים.\nהתוצאות מראות את הקונצנזוס הציבורי בזמן אמת.\nגם חברי כנסת ולוביסטים חושפים את עמדותיהם.',
+    bg: 'from-indigo-900 via-purple-800 to-pink-900',
+    accent: 'text-purple-300',
   },
   {
     emoji: '🇮🇱',
@@ -109,25 +116,25 @@ export default function WhatIsHukit() {
   };
 
   return (
-    <div className="relative overflow-hidden rounded-3xl shadow-2xl select-none" style={{ aspectRatio: '2/1' }}>
+    <div className="relative overflow-hidden rounded-2xl md:rounded-3xl shadow-2xl select-none" style={{ minHeight: '340px' }}>
       {/* Main slide area */}
       <div className={`bg-gradient-to-bl ${slide.bg} transition-all duration-700 ease-in-out absolute inset-0`} />
 
-      <div className="relative h-full flex flex-col items-center justify-center text-center px-6 md:px-20 pb-16">
+      <div className="relative min-h-[340px] flex flex-col items-center justify-center text-center px-4 md:px-20 pb-16 pt-6">
         {/* Animated emoji */}
-        <div className="text-5xl md:text-7xl mb-4 md:mb-6 animate-bounce" style={{ animationDuration: '2s' }}>
+        <div className="text-4xl md:text-7xl mb-3 md:mb-6 animate-bounce" style={{ animationDuration: '2s' }}>
           {slide.emoji}
         </div>
 
         {/* Title */}
-        <h3 className="text-xl md:text-4xl font-black text-white mb-3 md:mb-5 max-w-4xl leading-tight">
+        <h3 className="text-lg md:text-4xl font-black text-white mb-2 md:mb-5 max-w-4xl leading-snug">
           {slide.title}
         </h3>
 
         {/* Body text */}
         <div className="max-w-3xl">
           {slide.body.split('\n').map((line, i) => (
-            <p key={i} className={`text-sm md:text-xl ${slide.accent} mb-1 md:mb-2 leading-relaxed`}>
+            <p key={i} className={`text-xs md:text-xl ${slide.accent} mb-1 md:mb-2 leading-relaxed`}>
               {line}
             </p>
           ))}
