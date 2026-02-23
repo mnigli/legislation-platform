@@ -89,6 +89,50 @@ router.get('/me', authenticateToken, async (req: Request, res: Response) => {
   }
 });
 
+// POST /auth/setup-admin - Create initial admin user (protected by SETUP_SECRET env var)
+router.post('/setup-admin', async (req: Request, res: Response) => {
+  try {
+    const { secret, email, name } = req.body;
+    const setupSecret = process.env.SETUP_SECRET;
+
+    if (!setupSecret || secret !== setupSecret) {
+      res.status(403).json({ success: false, error: { code: 'FORBIDDEN', message: 'סוד לא תקין' } });
+      return;
+    }
+
+    if (!email || !name) {
+      res.status(400).json({ success: false, error: { code: 'VALIDATION_ERROR', message: 'נדרש email ו-name' } });
+      return;
+    }
+
+    // Upsert: create or update to ADMIN
+    const user = await prisma.user.upsert({
+      where: { email },
+      update: { role: 'ADMIN', isVerified: true },
+      create: {
+        email,
+        name,
+        googleId: `setup-${Date.now()}`,
+        role: 'ADMIN',
+        isVerified: true,
+      },
+    });
+
+    const token = generateToken({ id: user.id, email: user.email, role: user.role });
+
+    res.json({
+      success: true,
+      data: {
+        token,
+        user: { id: user.id, email: user.email, name: user.name, role: user.role },
+      },
+    });
+  } catch (error) {
+    console.error('Setup admin error:', error);
+    res.status(500).json({ success: false, error: { code: 'INTERNAL_ERROR', message: 'שגיאה' } });
+  }
+});
+
 // POST /auth/verify-email - Send verification email
 router.post('/verify-email', authenticateToken, async (req: Request, res: Response) => {
   try {
