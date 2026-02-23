@@ -1,12 +1,11 @@
 import { useState, useEffect, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { FiTarget } from 'react-icons/fi';
 import QuizStep from './QuizStep';
-import QuizResults from './QuizResults';
 import {
   QUIZ_QUESTIONS,
   saveQuizAnswers,
   loadQuizAnswers,
-  clearQuizAnswers,
 } from '../../lib/demographicMapping';
 import type { QuizAnswers } from '../../lib/demographicMapping';
 
@@ -19,20 +18,24 @@ const EMPTY_ANSWERS: QuizAnswers = {
 export default function DemographicQuestionnaire() {
   const [currentStep, setCurrentStep] = useState(0);
   const [answers, setAnswers] = useState<QuizAnswers>({ ...EMPTY_ANSWERS });
-  const [isComplete, setIsComplete] = useState(false);
-  const [savedAnswers, setSavedAnswers] = useState<QuizAnswers | null>(null);
+  const [alreadyCompleted, setAlreadyCompleted] = useState(false);
+  const navigate = useNavigate();
 
-  // Load saved answers on mount
+  // Check if quiz was already completed — if so, show a "see results" link
   useEffect(() => {
     const saved = loadQuizAnswers();
     if (saved) {
-      setSavedAnswers(saved);
-      setIsComplete(true);
+      setAlreadyCompleted(true);
     }
   }, []);
 
   const question = QUIZ_QUESTIONS[currentStep];
   const isSingleSelect = question?.maxSelect === 1;
+
+  const completeQuiz = useCallback((finalAnswers: QuizAnswers) => {
+    saveQuizAnswers(finalAnswers);
+    navigate('/results');
+  }, [navigate]);
 
   const handleAnswer = useCallback((value: string[] | string) => {
     const qId = question.id;
@@ -54,33 +57,19 @@ export default function DemographicQuestionnaire() {
         if (currentStep < QUIZ_QUESTIONS.length - 1) {
           setCurrentStep(currentStep + 1);
         } else {
-          // Last question — complete
-          saveQuizAnswers(newAnswers);
-          setSavedAnswers(newAnswers);
-          setIsComplete(true);
+          completeQuiz(newAnswers);
         }
       }, 300);
     }
-  }, [question, answers, currentStep, isSingleSelect]);
+  }, [question, answers, currentStep, isSingleSelect, completeQuiz]);
 
   const handleNext = useCallback(() => {
     if (currentStep < QUIZ_QUESTIONS.length - 1) {
       setCurrentStep(currentStep + 1);
     } else {
-      // Last question — complete
-      saveQuizAnswers(answers);
-      setSavedAnswers(answers);
-      setIsComplete(true);
+      completeQuiz(answers);
     }
-  }, [currentStep, answers]);
-
-  const handleRetake = useCallback(() => {
-    clearQuizAnswers();
-    setSavedAnswers(null);
-    setIsComplete(false);
-    setCurrentStep(0);
-    setAnswers({ ...EMPTY_ANSWERS });
-  }, []);
+  }, [currentStep, answers, completeQuiz]);
 
   // Current answer for the step
   const currentValue = question
@@ -100,7 +89,40 @@ export default function DemographicQuestionnaire() {
       : !!answers.readingStyle
     : false;
 
-  const displayAnswers = savedAnswers || answers;
+  // If already completed, show a link to results instead of the quiz
+  if (alreadyCompleted) {
+    return (
+      <section className="max-w-7xl mx-auto px-4 pb-16">
+        <div className="text-center">
+          <div className="flex items-center justify-center gap-3 mb-3">
+            <div className="w-10 h-10 bg-knesset-blue rounded-xl flex items-center justify-center">
+              <FiTarget className="text-white" size={20} />
+            </div>
+            <h2 className="text-2xl md:text-3xl font-black text-gray-900">
+              כבר ענית על השאלון!
+            </h2>
+          </div>
+          <p className="text-base text-gray-500 max-w-2xl mx-auto mb-6">
+            מצאנו לך הצעות חוק לפי ההעדפות שלך.
+          </p>
+          <div className="flex items-center justify-center gap-4 flex-wrap">
+            <button
+              onClick={() => navigate('/results')}
+              className="bg-knesset-blue text-white px-8 py-3 rounded-xl font-bold text-lg hover:bg-blue-800 transition-colors"
+            >
+              צפו בתוצאות
+            </button>
+            <button
+              onClick={() => setAlreadyCompleted(false)}
+              className="border border-gray-300 text-gray-600 px-6 py-3 rounded-xl font-medium hover:bg-gray-50 transition-colors"
+            >
+              ענו שוב
+            </button>
+          </div>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section className="max-w-7xl mx-auto px-4 pb-16">
@@ -110,62 +132,51 @@ export default function DemographicQuestionnaire() {
           <div className="w-10 h-10 bg-knesset-blue rounded-xl flex items-center justify-center">
             <FiTarget className="text-white" size={20} />
           </div>
-          <h2 className="text-3xl md:text-4xl font-black text-gray-900">
-            {isComplete ? 'הצעות חוק בשבילך' : 'בואו נמצא את החקיקה שבאמת נוגעת אליך'}
+          <h2 className="text-2xl md:text-4xl font-black text-gray-900">
+            בואו נמצא את החקיקה שבאמת נוגעת אליך
           </h2>
         </div>
-        {!isComplete && (
-          <p className="text-lg text-gray-500 max-w-2xl mx-auto">
-            6 קליקים וזה הכל
-          </p>
-        )}
-        {isComplete && (
-          <p className="text-base text-gray-400 max-w-2xl mx-auto">
-            נבחר לפי תחומי העניין ומצב החיים שסימנת. תמיד אפשר לשנות.
-          </p>
-        )}
+        <p className="text-lg text-gray-500 max-w-2xl mx-auto">
+          6 קליקים וזה הכל
+        </p>
       </div>
 
-      {/* Content */}
-      {isComplete ? (
-        <QuizResults answers={displayAnswers} onRetake={handleRetake} />
-      ) : (
-        <div className="max-w-2xl mx-auto">
-          <div className="bg-white rounded-3xl border border-gray-100 shadow-lg p-8 md:p-12">
-            <QuizStep
-              question={question}
-              value={currentValue}
-              onChange={handleAnswer}
-              stepNumber={currentStep + 1}
-              totalSteps={QUIZ_QUESTIONS.length}
-            />
+      {/* Quiz */}
+      <div className="max-w-2xl mx-auto">
+        <div className="bg-white rounded-3xl border border-gray-100 shadow-lg p-8 md:p-12">
+          <QuizStep
+            question={question}
+            value={currentValue}
+            onChange={handleAnswer}
+            stepNumber={currentStep + 1}
+            totalSteps={QUIZ_QUESTIONS.length}
+          />
 
-            {/* Next button for multi-select questions */}
-            {!isSingleSelect && (
-              <div className="mt-8 flex justify-center">
-                <button
-                  onClick={handleNext}
-                  disabled={!canAdvance}
-                  className={`
-                    px-8 py-3 rounded-2xl font-bold text-lg transition-all duration-200
-                    ${canAdvance
-                      ? 'bg-knesset-blue text-white hover:bg-blue-800 shadow-lg shadow-blue-200 hover:scale-105'
-                      : 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                    }
-                  `}
-                >
-                  {currentStep === QUIZ_QUESTIONS.length - 1 ? 'הצג לי הצעות חוק שמתאימות לי' : 'המשך'}
-                </button>
-              </div>
-            )}
+          {/* Next button for multi-select questions */}
+          {!isSingleSelect && (
+            <div className="mt-8 flex justify-center">
+              <button
+                onClick={handleNext}
+                disabled={!canAdvance}
+                className={`
+                  px-8 py-3 rounded-2xl font-bold text-lg transition-all duration-200
+                  ${canAdvance
+                    ? 'bg-knesset-blue text-white hover:bg-blue-800 shadow-lg shadow-blue-200 hover:scale-105'
+                    : 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                  }
+                `}
+              >
+                {currentStep === QUIZ_QUESTIONS.length - 1 ? 'הצג לי הצעות חוק שמתאימות לי' : 'המשך'}
+              </button>
+            </div>
+          )}
 
-            {/* Trust line */}
-            <p className="text-center text-xs text-gray-400 mt-6">
-              🔒 אפשר לשנות העדפות בכל רגע. ההצעות מוצגות לפי תחומי עניין שבחרת בלבד.
-            </p>
-          </div>
+          {/* Trust line */}
+          <p className="text-center text-xs text-gray-400 mt-6">
+            🔒 אפשר לשנות העדפות בכל רגע. ההצעות מוצגות לפי תחומי עניין שבחרת בלבד.
+          </p>
         </div>
-      )}
+      </div>
     </section>
   );
 }

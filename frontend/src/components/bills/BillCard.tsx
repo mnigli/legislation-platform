@@ -19,15 +19,22 @@ export default function BillCard({ bill }: Props) {
   const navigate = useNavigate();
 
   // Get a clean summary text
-  const summaryText = bill.summaryHe
+  const rawSummary = bill.summaryHe
     ? bill.summaryHe.replace(/^##\s.*$/gm, '').replace(/^-\s/gm, '').replace(/\*\*/g, '').trim()
     : '';
 
-  const shortSummary = summaryText.length > 200
-    ? summaryText.slice(0, 200) + '...'
-    : summaryText;
+  // Inline version for the card (single line, no newlines)
+  const summaryInline = rawSummary.replace(/\n+/g, ' ').trim();
 
-  const fullSummary = summaryText;
+  const shortSummary = summaryInline.length > 180
+    ? summaryInline.slice(0, 180) + '...'
+    : summaryInline;
+
+  // Friendly fallback when no AI summary
+  const displaySummary = summaryInline
+    || `הצעת חוק זו עוסקת ב${bill.titleHe.includes('תיקון') ? 'תיקון חקיקה קיימת' : 'הסדרה חדשה'} שמשפיעה על חיי היומיום.`;
+
+  const fullSummary = rawSummary;
 
   const suggestionMutation = useMutation({
     mutationFn: (content: string) => api.createSuggestion(bill.id, content),
@@ -61,15 +68,14 @@ export default function BillCard({ bill }: Props) {
       >
         <div className="flex items-start justify-between gap-3">
           <div className="flex-1 min-w-0">
-            <h3 className="font-bold text-base md:text-lg text-gray-900 mb-2 leading-snug">
-              {bill.titleHe}
-            </h3>
-            <p className="text-gray-600 text-sm md:text-base leading-relaxed">
-              {expanded ? fullSummary : shortSummary}
+            {/* Summary is the main content - readable and accessible */}
+            <p className="text-gray-800 text-sm md:text-base leading-relaxed mb-2">
+              {expanded ? fullSummary || displaySummary : shortSummary || displaySummary}
             </p>
-            {!summaryText && (
-              <p className="text-gray-400 text-sm italic">תקציר בהכנה...</p>
-            )}
+            {/* Knesset title - small, secondary */}
+            <p className="text-xs text-gray-400 line-clamp-1">
+              {bill.titleHe}
+            </p>
           </div>
           <div className="flex flex-col items-center gap-2 shrink-0" onClick={(e) => e.stopPropagation()}>
             <RatingStars
@@ -102,7 +108,7 @@ export default function BillCard({ bill }: Props) {
       {expanded && (
         <div className="border-t border-gray-100 bg-gray-50 p-4 md:p-5">
           {/* Full summary if long */}
-          {summaryText.length > 200 && (
+          {rawSummary.length > 200 && (
             <div className="mb-4">
               <h4 className="font-semibold text-gray-800 mb-2 text-sm">תקציר מלא</h4>
               <p className="text-gray-700 text-sm leading-relaxed whitespace-pre-line">{fullSummary}</p>
