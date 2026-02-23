@@ -366,12 +366,12 @@ export default function ExplainerVideo() {
   };
 
   return (
-    <div className="relative overflow-hidden rounded-3xl shadow-2xl select-none" style={{ aspectRatio: '2/1' }}>
+    <div className="relative overflow-hidden rounded-2xl md:rounded-3xl shadow-2xl select-none min-h-[480px] md:min-h-0 md:aspect-[2/1]">
       {/* Background */}
       <div className={`bg-gradient-to-bl ${stage.bg} transition-all duration-700 ease-in-out absolute inset-0`} />
 
       {/* Content */}
-      <div className="relative h-full flex flex-col">
+      <div className="relative min-h-[480px] md:min-h-0 md:h-full flex flex-col">
         {/* Top bar — HUD style */}
         <div className="flex items-center justify-between px-4 md:px-8 pt-4 md:pt-6">
           {/* Day counter */}

@@ -116,11 +116,11 @@ export default function WhatIsHukit() {
   };
 
   return (
-    <div className="relative overflow-hidden rounded-2xl md:rounded-3xl shadow-2xl select-none" style={{ minHeight: '340px' }}>
+    <div className="relative overflow-hidden rounded-2xl md:rounded-3xl shadow-2xl select-none min-h-[400px] md:min-h-0 md:aspect-[2/1]">
       {/* Main slide area */}
       <div className={`bg-gradient-to-bl ${slide.bg} transition-all duration-700 ease-in-out absolute inset-0`} />
 
-      <div className="relative min-h-[340px] flex flex-col items-center justify-center text-center px-4 md:px-20 pb-16 pt-6">
+      <div className="relative min-h-[400px] md:min-h-0 md:h-full flex flex-col items-center justify-center text-center px-4 md:px-20 pb-16 pt-6">
         {/* Animated emoji */}
         <div className="text-4xl md:text-7xl mb-3 md:mb-6 animate-bounce" style={{ animationDuration: '2s' }}>
           {slide.emoji}
