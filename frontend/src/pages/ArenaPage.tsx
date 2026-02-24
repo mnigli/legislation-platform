@@ -1,11 +1,10 @@
-import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { FiCheck, FiMinus, FiX, FiLock, FiAlertCircle, FiCheckCircle, FiHelpCircle } from 'react-icons/fi';
+import { FiAlertCircle, FiCheckCircle, FiHelpCircle } from 'react-icons/fi';
 import { useAuthStore } from '../stores/authStore';
 import { ARENA_BILL } from '../data/arenaDemo';
 import SponsoredContent from '../components/arena/SponsoredContent';
 import KesetExplainer from '../components/arena/KesetExplainer';
-import PolisEmbed from '../components/arena/PolisEmbed';
+import PolisStyleVoting from '../components/arena/PolisStyleVoting';
 
 export default function ArenaPage() {
   const { user } = useAuthStore();
@@ -110,36 +109,17 @@ export default function ArenaPage() {
           </div>
         </section>
 
-        {/* Section: Pol.is Public Discussion (vTaiwan) */}
+        {/* Section: vTaiwan-style Public Voting */}
         <section>
           <h2 className="font-extrabold text-gray-900 mb-1 text-base md:text-lg flex items-center gap-2">
             🗳️ דיון ציבורי — הצביעו והשפיעו
           </h2>
-          <p className="text-gray-500 text-sm mb-5">קראו הצהרות, הצביעו עליהן, ונסחו הצהרות חדשות. המערכת ממפה את הקונצנזוס הציבורי בזמן אמת.</p>
+          <p className="text-gray-500 text-sm mb-5">קראו כל הצהרה, הצביעו עליה, ושימו לב איך הקונצנזוס מתגבש בזמן אמת.</p>
 
-          <PolisEmbed
-            pageId="keset-oct7-investigation"
-            topic="ועדת חקירה ממלכתית לאירועי 7 באוקטובר — מה דעתכם?"
-            userId={user?.id}
+          <PolisStyleVoting
+            statements={bill.statements}
+            canVote={canVote}
           />
-        </section>
-
-        {/* Section: Our Community Statements (demo — kept for context) */}
-        <section className="bg-white rounded-xl border border-gray-200 p-4 md:p-6">
-          <h2 className="font-extrabold text-gray-900 mb-1 text-base md:text-lg flex items-center gap-2">
-            📊 שאלות מנחות
-          </h2>
-          <p className="text-gray-500 text-sm mb-5">שאלות מפתח שעלו בדיון הציבורי</p>
-
-          <div className="space-y-4">
-            {bill.statements.map((stmt) => (
-              <ArenaStatementCard
-                key={stmt.id}
-                statement={stmt}
-                canVote={canVote}
-              />
-            ))}
-          </div>
         </section>
 
         {/* Section: Stakeholders */}
@@ -249,132 +229,3 @@ export default function ArenaPage() {
   );
 }
 
-// ---- Inline arena statement card with local vote state ----
-
-interface StatementProps {
-  statement: {
-    id: string;
-    content: string;
-    agreeCount: number;
-    neutralCount: number;
-    disagreeCount: number;
-  };
-  canVote: boolean;
-}
-
-function ArenaStatementCard({ statement, canVote }: StatementProps) {
-  const [userVote, setUserVote] = useState<number | null>(null);
-  const [counts, setCounts] = useState({
-    agree: statement.agreeCount,
-    neutral: statement.neutralCount,
-    disagree: statement.disagreeCount,
-  });
-
-  const total = counts.agree + counts.neutral + counts.disagree;
-  const showResults = userVote !== null || total > 0;
-
-  const handleVote = (value: number) => {
-    if (!canVote) return;
-
-    if (userVote !== null) {
-      // Undo previous vote
-      setCounts(prev => ({
-        agree: prev.agree - (userVote === 1 ? 1 : 0),
-        neutral: prev.neutral - (userVote === 0 ? 1 : 0),
-        disagree: prev.disagree - (userVote === -1 ? 1 : 0),
-      }));
-    }
-
-    if (userVote === value) {
-      // Toggle off
-      setUserVote(null);
-      return;
-    }
-
-    // Add new vote
-    setUserVote(value);
-    setCounts(prev => ({
-      agree: prev.agree + (value === 1 ? 1 : 0) - (userVote === 1 ? 1 : 0),
-      neutral: prev.neutral + (value === 0 ? 1 : 0) - (userVote === 0 ? 1 : 0),
-      disagree: prev.disagree + (value === -1 ? 1 : 0) - (userVote === -1 ? 1 : 0),
-    }));
-  };
-
-  const pct = (n: number) => total > 0 ? Math.round((n / total) * 100) : 0;
-
-  return (
-    <div className="bg-gray-50 rounded-lg border border-gray-200 p-4">
-      <p className="font-semibold text-gray-900 text-sm md:text-base mb-3 leading-relaxed text-center">
-        {statement.content}
-      </p>
-
-      {/* Vote buttons */}
-      <div className="flex justify-center gap-2 mb-3">
-        <button
-          onClick={() => handleVote(1)}
-          disabled={!canVote}
-          className={`flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium transition-all
-            ${userVote === 1
-              ? 'bg-green-600 text-white shadow-sm'
-              : canVote
-                ? 'bg-green-50 text-green-700 border border-green-200 hover:bg-green-100'
-                : 'bg-gray-100 text-gray-400 cursor-not-allowed'
-            }`}
-        >
-          <FiCheck size={14} /> מסכים
-        </button>
-        <button
-          onClick={() => handleVote(0)}
-          disabled={!canVote}
-          className={`flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium transition-all
-            ${userVote === 0
-              ? 'bg-gray-600 text-white shadow-sm'
-              : canVote
-                ? 'bg-gray-50 text-gray-600 border border-gray-200 hover:bg-gray-100'
-                : 'bg-gray-100 text-gray-400 cursor-not-allowed'
-            }`}
-        >
-          <FiMinus size={14} /> ניטרלי
-        </button>
-        <button
-          onClick={() => handleVote(-1)}
-          disabled={!canVote}
-          className={`flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium transition-all
-            ${userVote === -1
-              ? 'bg-red-600 text-white shadow-sm'
-              : canVote
-                ? 'bg-red-50 text-red-700 border border-red-200 hover:bg-red-100'
-                : 'bg-gray-100 text-gray-400 cursor-not-allowed'
-            }`}
-        >
-          <FiX size={14} /> לא מסכים
-        </button>
-      </div>
-
-      {/* Results */}
-      {showResults && (
-        <div className="space-y-1.5 mt-3">
-          <ResultBar label="מסכים" count={counts.agree} pct={pct(counts.agree)} color="bg-green-500" />
-          <ResultBar label="ניטרלי" count={counts.neutral} pct={pct(counts.neutral)} color="bg-gray-400" />
-          <ResultBar label="לא מסכים" count={counts.disagree} pct={pct(counts.disagree)} color="bg-red-500" />
-          <p className="text-xs text-gray-400 text-center mt-1">{total} מצביעים</p>
-        </div>
-      )}
-    </div>
-  );
-}
-
-function ResultBar({ label, count, pct, color }: { label: string; count: number; pct: number; color: string }) {
-  return (
-    <div className="flex items-center gap-2 text-xs">
-      <span className="w-16 text-gray-600 text-left shrink-0">{label}</span>
-      <div className="flex-1 bg-gray-200 rounded-full h-2 overflow-hidden">
-        <div
-          className={`h-full rounded-full transition-all duration-500 ${color}`}
-          style={{ width: `${pct}%` }}
-        />
-      </div>
-      <span className="w-12 text-gray-500 text-left shrink-0">{pct}% ({count})</span>
-    </div>
-  );
-}

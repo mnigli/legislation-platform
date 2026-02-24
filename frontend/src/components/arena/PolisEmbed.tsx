@@ -1,59 +1,71 @@
-import { useEffect, useRef, useState } from 'react';
-import { FiUsers, FiMessageCircle, FiBarChart2, FiExternalLink } from 'react-icons/fi';
+import { useState, useEffect, useRef } from 'react';
+import { FiUsers, FiMessageCircle, FiBarChart2, FiExternalLink, FiEdit3, FiCheckCircle } from 'react-icons/fi';
+import { api } from '../../services/api';
 
 interface PolisEmbedProps {
-  /** Unique page identifier for this bill/discussion */
-  pageId: string;
+  /**
+   * The Pol.is conversation ID (e.g., "2abcde" from pol.is/2abcde).
+   * If not provided, shows a placeholder with instructions.
+   */
+  conversationId?: string;
   /** Display topic for the conversation */
   topic: string;
-  /** Optional: external user ID to link Pol.is sessions */
-  userId?: string;
 }
 
 /**
- * Embeds a Pol.is conversation using the official embed.js script.
- * Auto-creates a conversation for the given pageId if none exists.
+ * Embeds a Pol.is conversation via direct iframe.
+ * Works with any public Pol.is conversation — no site registration required.
+ * Also fetches participation stats from our backend proxy.
  */
-export default function PolisEmbed({ pageId, topic, userId }: PolisEmbedProps) {
-  const containerRef = useRef<HTMLDivElement>(null);
+export default function PolisEmbed({ conversationId, topic }: PolisEmbedProps) {
+  const iframeRef = useRef<HTMLIFrameElement>(null);
   const [loaded, setLoaded] = useState(false);
   const [error, setError] = useState(false);
+  const [stats, setStats] = useState<{
+    participants?: number;
+    comments?: number;
+    groups?: number;
+  } | null>(null);
 
+  // Fetch stats from our backend proxy
   useEffect(() => {
-    if (!containerRef.current) return;
+    if (!conversationId) return;
 
-    // Clean previous embed
-    const container = containerRef.current;
-    container.innerHTML = '';
+    const fetchStats = async () => {
+      try {
+        const [summaryRes, commentsRes] = await Promise.allSettled([
+          api.getPolisSummary(conversationId),
+          api.getPolisComments(conversationId),
+        ]);
 
-    // Create the polis div
-    const polisDiv = document.createElement('div');
-    polisDiv.className = 'polis';
-    polisDiv.setAttribute('data-page_id', pageId);
-    polisDiv.setAttribute('data-site_id', 'polis');
-    polisDiv.setAttribute('data-topic', topic);
-    polisDiv.setAttribute('data-ucw', 'true');
-    polisDiv.setAttribute('data-ucv', 'true');
-    polisDiv.setAttribute('data-show_vis', 'true');
-    polisDiv.setAttribute('data-auth_needed_to_vote', 'false');
-    polisDiv.setAttribute('data-auth_needed_to_write', 'false');
-    if (userId) {
-      polisDiv.setAttribute('data-xid', userId);
-    }
-    container.appendChild(polisDiv);
+        const newStats: typeof stats = {};
 
-    // Load the embed script
-    const script = document.createElement('script');
-    script.src = 'https://pol.is/embed.js';
-    script.async = true;
-    script.onload = () => setLoaded(true);
-    script.onerror = () => setError(true);
-    container.appendChild(script);
+        if (summaryRes.status === 'fulfilled' && summaryRes.value?.data) {
+          const d = summaryRes.value.data;
+          newStats.participants = d.n || d.ptpt_cnt || 0;
+          newStats.groups = d.group_clusters?.length || 0;
+        }
 
-    return () => {
-      container.innerHTML = '';
+        if (commentsRes.status === 'fulfilled' && commentsRes.value?.data) {
+          const comments = Array.isArray(commentsRes.value.data)
+            ? commentsRes.value.data
+            : [];
+          newStats.comments = comments.length;
+        }
+
+        setStats(newStats);
+      } catch {
+        // Stats are optional — don't block on failure
+      }
     };
-  }, [pageId, topic, userId]);
+
+    fetchStats();
+    // Refresh stats every 2 minutes
+    const interval = setInterval(fetchStats, 120_000);
+    return () => clearInterval(interval);
+  }, [conversationId]);
+
+  const polisUrl = conversationId ? `https://pol.is/${conversationId}` : null;
 
   return (
     <div className="space-y-4">
@@ -87,13 +99,63 @@ export default function PolisEmbed({ pageId, topic, userId }: PolisEmbedProps) {
         </div>
       </div>
 
+      {/* Live stats bar */}
+      {stats && (stats.participants || stats.comments) && (
+        <div className="flex items-center justify-center gap-4 md:gap-6 py-2">
+          {stats.participants !== undefined && stats.participants > 0 && (
+            <div className="flex items-center gap-1.5 text-sm text-gray-600">
+              <FiUsers className="text-primary-500" size={14} />
+              <span className="font-bold text-gray-900">{stats.participants}</span>
+              <span>משתתפים</span>
+            </div>
+          )}
+          {stats.comments !== undefined && stats.comments > 0 && (
+            <div className="flex items-center gap-1.5 text-sm text-gray-600">
+              <FiEdit3 className="text-teal-500" size={14} />
+              <span className="font-bold text-gray-900">{stats.comments}</span>
+              <span>הצהרות</span>
+            </div>
+          )}
+          {stats.groups !== undefined && stats.groups > 1 && (
+            <div className="flex items-center gap-1.5 text-sm text-gray-600">
+              <FiCheckCircle className="text-amber-500" size={14} />
+              <span className="font-bold text-gray-900">{stats.groups}</span>
+              <span>קבוצות דעה</span>
+            </div>
+          )}
+        </div>
+      )}
+
       {/* Pol.is embed container */}
       <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
-        {error ? (
+        {!polisUrl ? (
+          /* No conversation configured — show placeholder */
+          <div className="p-8 md:p-12 text-center space-y-4">
+            <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-teal-100 to-cyan-100 flex items-center justify-center mx-auto">
+              <FiBarChart2 className="text-teal-600" size={28} />
+            </div>
+            <div>
+              <h3 className="font-bold text-gray-900 text-base mb-2">הדיון הציבורי בהכנה</h3>
+              <p className="text-gray-500 text-sm max-w-md mx-auto leading-relaxed">
+                הדיון הציבורי על הצעת חוק זו ייפתח בקרוב באמצעות מנוע הקונצנזוס של Pol.is.
+                בינתיים, אתם מוזמנים להצביע על השאלות המנחות למטה.
+              </p>
+            </div>
+            <a
+              href="https://pol.is"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 text-teal-600 font-medium text-sm hover:underline"
+            >
+              מה זה Pol.is?
+              <FiExternalLink size={14} />
+            </a>
+          </div>
+        ) : error ? (
           <div className="p-8 text-center">
             <p className="text-gray-500 text-sm mb-3">לא הצלחנו לטעון את הדיון</p>
             <a
-              href={`https://pol.is/${pageId}`}
+              href={polisUrl}
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-1.5 text-primary-600 font-medium text-sm hover:underline"
@@ -110,23 +172,42 @@ export default function PolisEmbed({ pageId, topic, userId }: PolisEmbedProps) {
                 <p className="text-gray-400 text-sm">טוען את הדיון הציבורי...</p>
               </div>
             )}
-            <div
-              ref={containerRef}
-              className="min-h-[500px] polis-container"
-              style={{ direction: 'ltr' }}
+            <iframe
+              ref={iframeRef}
+              src={polisUrl}
+              title={topic}
+              className={`w-full border-0 transition-opacity duration-300 ${loaded ? 'opacity-100' : 'opacity-0'}`}
+              style={{ minHeight: '680px', direction: 'ltr' }}
+              onLoad={() => setLoaded(true)}
+              onError={() => setError(true)}
+              allow="clipboard-write"
+              sandbox="allow-same-origin allow-scripts allow-forms allow-popups allow-popups-to-escape-sandbox"
             />
           </>
         )}
       </div>
 
-      {/* Attribution */}
-      <p className="text-center text-[10px] text-gray-400">
-        מופעל על ידי{' '}
-        <a href="https://pol.is" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">
-          Pol.is
-        </a>
-        {' '}— פלטפורמת vTaiwan לדמוקרטיה דיגיטלית
-      </p>
+      {/* Direct link & attribution */}
+      <div className="flex items-center justify-between">
+        {polisUrl && (
+          <a
+            href={polisUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1.5 text-primary-600 font-medium text-xs hover:underline"
+          >
+            פתחו בחלון חדש
+            <FiExternalLink size={12} />
+          </a>
+        )}
+        <p className={`text-[10px] text-gray-400 ${polisUrl ? '' : 'mx-auto'}`}>
+          מופעל על ידי{' '}
+          <a href="https://pol.is" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-600">
+            Pol.is
+          </a>
+          {' '}— פלטפורמת vTaiwan לדמוקרטיה דיגיטלית
+        </p>
+      </div>
     </div>
   );
 }
