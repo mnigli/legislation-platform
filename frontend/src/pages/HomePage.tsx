@@ -34,7 +34,7 @@ export default function HomePage() {
               <FiArrowLeft size={18} />
             </Link>
             <Link to="/arena" className="w-full sm:w-auto border-2 border-knesset-gold/60 text-knesset-gold px-8 py-3.5 rounded-xl font-bold text-lg hover:bg-knesset-gold/10 transition-colors flex items-center justify-center gap-2">
-              🏟️ זירת דיונים
+              ✒️ קֶסֶת
               <FiArrowLeft size={18} />
             </Link>
           </div>

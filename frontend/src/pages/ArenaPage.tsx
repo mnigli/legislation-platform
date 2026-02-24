@@ -4,6 +4,7 @@ import { FiCheck, FiMinus, FiX, FiLock, FiAlertCircle, FiCheckCircle, FiHelpCirc
 import { useAuthStore } from '../stores/authStore';
 import { ARENA_BILL } from '../data/arenaDemo';
 import SponsoredContent from '../components/arena/SponsoredContent';
+import KesetExplainer from '../components/arena/KesetExplainer';
 
 export default function ArenaPage() {
   const { user } = useAuthStore();
@@ -20,7 +21,7 @@ export default function ArenaPage() {
       <div className="bg-gradient-to-bl from-knesset-blue to-blue-900 text-white py-10 md:py-14">
         <div className="max-w-3xl mx-auto px-4 text-center">
           <span className="text-xs bg-white/20 px-3 py-1 rounded-full mb-4 inline-block">
-            🏟️ זירת דיונים
+            ✒️ קֶסֶת
           </span>
           <h1 className="text-xl md:text-3xl font-extrabold leading-snug mb-4">
             {bill.citizenTitle}
@@ -29,6 +30,19 @@ export default function ArenaPage() {
             {bill.officialName}
           </p>
         </div>
+      </div>
+
+      {/* Keset Explainer Video */}
+      <div className="max-w-4xl mx-auto px-4 py-8 md:py-12">
+        <div className="text-center mb-6">
+          <h2 className="text-xl md:text-3xl font-black text-gray-900 mb-2">
+            ✒️ מה זה <span className="text-knesset-blue">קֶסֶת</span>?
+          </h2>
+          <p className="text-sm md:text-base text-gray-500">
+            המודל הדמוקרטי שמאפשר לציבור להשפיע על חקיקה
+          </p>
+        </div>
+        <KesetExplainer />
       </div>
 
       <div className="max-w-3xl mx-auto px-4 py-6 md:py-10 space-y-6 md:space-y-8">
@@ -109,11 +123,11 @@ export default function ArenaPage() {
               <div>
                 {!user ? (
                   <p className="text-sm text-gray-600">
-                    <Link to="/login" className="text-primary-600 font-bold hover:underline">התחברו</Link> כדי להצביע. לאחר ההתחברות, דרגו לפחות הצעת חוק אחת ב<Link to="/bills" className="text-primary-600 font-bold hover:underline">דף ההצעות</Link> כדי לפתוח את ההצבעה בזירה.
+                    <Link to="/login" className="text-primary-600 font-bold hover:underline">התחברו</Link> כדי להצביע. לאחר ההתחברות, דרגו לפחות הצעת חוק אחת ב<Link to="/bills" className="text-primary-600 font-bold hover:underline">דף ההצעות</Link> כדי לפתוח את ההצבעה בקֶסֶת.
                   </p>
                 ) : (
                   <p className="text-sm text-gray-600">
-                    כדי להצביע בזירת הדיונים, דרגו לפחות הצעת חוק אחת ב<Link to="/bills" className="text-primary-600 font-bold hover:underline">דף ההצעות</Link>.
+                    כדי להצביע בקֶסֶת, דרגו לפחות הצעת חוק אחת ב<Link to="/bills" className="text-primary-600 font-bold hover:underline">דף ההצעות</Link>.
                   </p>
                 )}
               </div>
@@ -202,7 +216,7 @@ export default function ArenaPage() {
               </div>
             </div>
             <div className="flex gap-3 items-start">
-              <span className="text-lg">🏟️</span>
+              <span className="text-lg">✒️</span>
               <div>
                 <h4 className="font-semibold text-gray-900 text-sm">סטטוס בפלטפורמה</h4>
                 <p className="text-gray-600 text-sm leading-relaxed">{bill.processStatus.platformStatus}</p>

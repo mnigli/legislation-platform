@@ -11,66 +11,66 @@ interface Slide {
 
 const SLIDES: Slide[] = [
   {
-    emoji: '🏛️',
-    title: 'כל שנה מוגשות מאות הצעות חוק',
-    body: 'בכנסת ישראל מוגשות מדי שנה כ-350 הצעות חוק חדשות.\nאבל מי באמת קורא אותן? מי מבין את ההשפעה שלהן על חיי היומיום?',
-    bg: 'from-slate-900 via-knesset-blue to-blue-900',
-    accent: 'text-blue-300',
-  },
-  {
-    emoji: '😕',
-    title: 'השפה המשפטית חוסמת אזרחים',
-    body: 'הצעות חוק נכתבות בשפה משפטית מורכבת.\nרוב האזרחים לא מבינים מה בדיוק מוצע — ולא יכולים להשפיע על התהליך.',
-    bg: 'from-red-900 via-rose-800 to-pink-900',
-    accent: 'text-rose-300',
-  },
-  {
-    emoji: '💡',
-    title: 'הפתרון: חוקית',
-    body: 'פלטפורמה שהופכת את החקיקה הישראלית לנגישה, שקופה ומשתפת.\nכל אזרח יכול להשתתף בתהליך החקיקה.',
+    emoji: '✒️',
+    title: 'מה זה קֶסֶת?',
+    body: 'השם נשאב מכלי הכתיבה של הסופרים בדורות קדומים —\nהכלי שממנו יצאו מילים שעיצבו חוקים ומסורות.\nהיום, קֶסֶת נותנת את אותו כלי לכולם.',
     bg: 'from-knesset-blue via-indigo-800 to-violet-900',
     accent: 'text-knesset-gold',
   },
   {
-    emoji: '🤖',
-    title: 'תקצירים בשפה פשוטה עם AI',
-    body: 'כל הצעת חוק מהכנסת מופיעה בפלטפורמה עם תקציר אוטומטי\nבשפה פשוטה שנוצר באמצעות בינה מלאכותית — כדי שכולם יבינו.',
-    bg: 'from-purple-900 via-violet-800 to-indigo-900',
-    accent: 'text-violet-300',
+    emoji: '🔥',
+    title: 'מתי הצעת חוק מגיעה לקֶסֶת?',
+    body: 'הצעות חוק שמגיעות לסף מסוים של מעורבות ציבורית,\nאו נושאים שנויים במחלוקת במיוחד — עולות לשלב השני.\nכאן הציבור מדבר, לא רק הפוליטיקאים.',
+    bg: 'from-red-900 via-rose-800 to-orange-900',
+    accent: 'text-rose-300',
   },
   {
-    emoji: '⭐',
-    title: 'שלב 1: דרגו והציעו שיפורים',
-    body: 'קראו תקצירים של הצעות חוק בשפה פשוטה.\nדרגו מ-1 עד 5 כוכבים והציעו שיפורים לנוסח.\nהצעות עם דירוג גבוה עולות לקֶסֶת.',
-    bg: 'from-amber-900 via-orange-800 to-yellow-900',
-    accent: 'text-amber-300',
-  },
-  {
-    emoji: '✒️',
-    title: 'שלב 2: קֶסֶת',
-    body: 'הצעות חוק שנויות במחלוקת מגיעות לקֶסֶת.\nשם תמצאו ניתוח מעמיק: נקודות מחלוקת, בעלי עניין, ומה פתוח לשינוי.\nהצביעו על שאלות מפתח וקבעו את העמדה הציבורית.',
+    emoji: '🇹🇼',
+    title: 'המודל הטייוואני — vTaiwan',
+    body: 'קֶסֶת מבוססת על vTaiwan — תהליך דמוקרטי דיגיטלי\nשפותח בטייוואן ב-2014 ושינה את הדרך שבה ממשלות מחליטות.\nהרעיון: במקום להתווכח מי צודק — לגלות על מה מסכימים.',
     bg: 'from-teal-900 via-cyan-800 to-blue-900',
     accent: 'text-cyan-300',
   },
   {
-    emoji: '🗳️',
-    title: 'הצבעה ציבורית על שאלות מפתח',
-    body: 'בקֶסֶת, כל שאלה נפתחת להצבעה: מסכים, ניטרלי, או לא מסכים.\nהתוצאות מראות את הקונצנזוס הציבורי בזמן אמת.\nגם חברי כנסת ולוביסטים חושפים את עמדותיהם.',
-    bg: 'from-indigo-900 via-purple-800 to-pink-900',
-    accent: 'text-purple-300',
+    emoji: '📋',
+    title: 'שלב 1: הגדרת הבעיה',
+    body: 'הנושא מוצג בשפה ניטרלית עם כל הנתונים.\nבעלי עניין, שאלות פתוחות, מה כבר נקבע ומה לא.\nהכל שקוף — כדי שכולם יתחילו מאותה נקודה.',
+    bg: 'from-slate-900 via-blue-900 to-knesset-blue',
+    accent: 'text-blue-300',
   },
   {
-    emoji: '🇮🇱',
-    title: 'חוקית — כי חקיקה היא לא רק של פוליטיקאים',
-    body: 'הצטרפו עכשיו והשפיעו על החוקים שמעצבים את חייכם.\nדמוקרטיה מתחילה כשאזרחים מבינים, משתתפים ומשפיעים.',
+    emoji: '🗣️',
+    title: 'שלב 2: איסוף עמדות',
+    body: 'הציבור מנסח הצהרות קצרות, וכולם מצביעים עליהן.\nאין ויכוחים ישירים — רק עמדות ברורות.\nמסכים, ניטרלי, או לא מסכים.',
+    bg: 'from-purple-900 via-violet-800 to-indigo-900',
+    accent: 'text-violet-300',
+  },
+  {
+    emoji: '🗺️',
+    title: 'שלב 3: מיפוי קונצנזוס',
+    body: 'אלגוריתם מזהה אילו הצהרות מקבלות תמיכה חוצת מחנות.\nאיפה יש הסכמה רחבה? ואיפה נשארות מחלוקות אמיתיות?\nהתוצאה: תמונה ברורה של דעת הציבור.',
+    bg: 'from-emerald-900 via-green-900 to-teal-900',
+    accent: 'text-emerald-300',
+  },
+  {
+    emoji: '📜',
+    title: 'שלב 4: גיבוש "קול הציבור"',
+    body: 'מסמך שמבוסס על ההסכמות — לא על הצעקות.\nאפשר להגיש אותו לכנסת, לתקשורת ולציבור.\nהקול שלכם הופך לכוח אמיתי.',
+    bg: 'from-amber-900 via-orange-800 to-yellow-900',
+    accent: 'text-amber-300',
+  },
+  {
+    emoji: '✅',
+    title: 'זה עובד.',
+    body: 'בטייוואן, כ-80% מהנושאים שטופלו ב-vTaiwan\nהסתיימו בצעד ממשלתי קונקרטי.\nחוקית וקֶסֶת מביאות את הפרוטוקול הזה לישראל.',
     bg: 'from-knesset-blue via-blue-800 to-indigo-900',
     accent: 'text-knesset-gold',
   },
 ];
 
-const SLIDE_DURATION = 5000;
+const SLIDE_DURATION = 5500;
 
-export default function WhatIsHukit() {
+export default function KesetExplainer() {
   const [current, setCurrent] = useState(0);
   const [playing, setPlaying] = useState(true);
   const [progress, setProgress] = useState(0);
@@ -117,11 +117,11 @@ export default function WhatIsHukit() {
 
   return (
     <div className="relative overflow-hidden rounded-2xl md:rounded-3xl shadow-2xl select-none min-h-[400px] md:min-h-0 md:aspect-[2/1]">
-      {/* Main slide area */}
+      {/* Background */}
       <div className={`bg-gradient-to-bl ${slide.bg} transition-all duration-700 ease-in-out absolute inset-0`} />
 
       <div className="relative min-h-[400px] md:min-h-0 md:h-full flex flex-col items-center justify-center text-center px-4 md:px-20 pb-16 pt-6">
-        {/* Animated emoji */}
+        {/* Emoji */}
         <div className="text-4xl md:text-7xl mb-3 md:mb-6 animate-bounce" style={{ animationDuration: '2s' }}>
           {slide.emoji}
         </div>
@@ -131,7 +131,7 @@ export default function WhatIsHukit() {
           {slide.title}
         </h3>
 
-        {/* Body text */}
+        {/* Body */}
         <div className="max-w-3xl">
           {slide.body.split('\n').map((line, i) => (
             <p key={i} className={`text-xs md:text-xl ${slide.accent} mb-1 md:mb-2 leading-relaxed`}>

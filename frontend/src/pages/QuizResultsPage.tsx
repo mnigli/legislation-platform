@@ -382,7 +382,7 @@ export default function QuizResultsPage() {
           to="/arena"
           className="w-full sm:w-auto border-2 border-knesset-blue text-knesset-blue px-6 py-2.5 rounded-xl font-bold hover:bg-blue-50 transition-colors flex items-center justify-center gap-2 text-sm"
         >
-          🏟️ זירת דיונים
+          ✒️ קֶסֶת
           <FiArrowLeft size={14} />
         </Link>
         <button

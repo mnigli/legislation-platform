@@ -32,8 +32,8 @@ export default function Header() {
               to="/arena"
               className={`transition-colors font-medium flex items-center gap-1.5 ${isActive('/arena') ? 'text-knesset-gold' : 'hover:text-knesset-gold'}`}
             >
-              <span>🏟️</span>
-              זירת דיונים
+              <span>✒️</span>
+              קֶסֶת
             </Link>
 
             {user ? (
@@ -79,7 +79,7 @@ export default function Header() {
                 onClick={() => setMenuOpen(false)}
                 className={`text-lg font-medium ${isActive('/arena') ? 'text-knesset-gold' : 'hover:text-knesset-gold'}`}
               >
-                🏟️ זירת דיונים
+                ✒️ קֶסֶת
               </Link>
               <div className="border-t border-white/20 my-1" />
               {user ? (
