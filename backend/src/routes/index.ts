@@ -7,6 +7,7 @@ import usersRoutes from './users.routes';
 import notificationsRoutes from './notifications.routes';
 import knessetRoutes from './knesset.routes';
 import dashboardRoutes from './dashboard.routes';
+import polisRoutes from './polis.routes';
 
 const router = Router();
 
@@ -19,5 +20,6 @@ router.use('/users', usersRoutes);
 router.use('/notifications', notificationsRoutes);
 router.use('/knesset', knessetRoutes);
 router.use('/dashboard', dashboardRoutes);
+router.use('/polis', polisRoutes);
 
 export default router;

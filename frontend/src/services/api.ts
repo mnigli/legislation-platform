@@ -185,6 +185,15 @@ class ApiClient {
       body: JSON.stringify({ value }),
     });
   }
+
+  // Pol.is proxy
+  async getPolisSummary(conversationId: string) {
+    return this.request<any>(`/polis/summary/${conversationId}`);
+  }
+
+  async getPolisComments(conversationId: string) {
+    return this.request<any>(`/polis/comments/${conversationId}`);
+  }
 }
 
 export const api = new ApiClient();

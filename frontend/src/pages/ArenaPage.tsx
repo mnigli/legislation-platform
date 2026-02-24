@@ -5,6 +5,7 @@ import { useAuthStore } from '../stores/authStore';
 import { ARENA_BILL } from '../data/arenaDemo';
 import SponsoredContent from '../components/arena/SponsoredContent';
 import KesetExplainer from '../components/arena/KesetExplainer';
+import PolisEmbed from '../components/arena/PolisEmbed';
 
 export default function ArenaPage() {
   const { user } = useAuthStore();
@@ -109,30 +110,26 @@ export default function ArenaPage() {
           </div>
         </section>
 
-        {/* Section: Public Voting (vTaiwan) */}
+        {/* Section: Pol.is Public Discussion (vTaiwan) */}
+        <section>
+          <h2 className="font-extrabold text-gray-900 mb-1 text-base md:text-lg flex items-center gap-2">
+            🗳️ דיון ציבורי — הצביעו והשפיעו
+          </h2>
+          <p className="text-gray-500 text-sm mb-5">קראו הצהרות, הצביעו עליהן, ונסחו הצהרות חדשות. המערכת ממפה את הקונצנזוס הציבורי בזמן אמת.</p>
+
+          <PolisEmbed
+            pageId="keset-oct7-investigation"
+            topic="ועדת חקירה ממלכתית לאירועי 7 באוקטובר — מה דעתכם?"
+            userId={user?.id}
+          />
+        </section>
+
+        {/* Section: Our Community Statements (demo — kept for context) */}
         <section className="bg-white rounded-xl border border-gray-200 p-4 md:p-6">
           <h2 className="font-extrabold text-gray-900 mb-1 text-base md:text-lg flex items-center gap-2">
-            🗳️ שאלות פתוחות לציבור
+            📊 שאלות מנחות
           </h2>
-          <p className="text-gray-500 text-sm mb-5">מה העמדה שלכם? הצביעו על כל שאלה</p>
-
-          {/* Access gate message */}
-          {!canVote && (
-            <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 mb-5 flex items-start gap-3">
-              <FiLock className="text-gray-400 mt-0.5 shrink-0" size={18} />
-              <div>
-                {!user ? (
-                  <p className="text-sm text-gray-600">
-                    <Link to="/login" className="text-primary-600 font-bold hover:underline">התחברו</Link> כדי להצביע. לאחר ההתחברות, דרגו לפחות הצעת חוק אחת ב<Link to="/bills" className="text-primary-600 font-bold hover:underline">דף ההצעות</Link> כדי לפתוח את ההצבעה בקֶסֶת.
-                  </p>
-                ) : (
-                  <p className="text-sm text-gray-600">
-                    כדי להצביע בקֶסֶת, דרגו לפחות הצעת חוק אחת ב<Link to="/bills" className="text-primary-600 font-bold hover:underline">דף ההצעות</Link>.
-                  </p>
-                )}
-              </div>
-            </div>
-          )}
+          <p className="text-gray-500 text-sm mb-5">שאלות מפתח שעלו בדיון הציבורי</p>
 
           <div className="space-y-4">
             {bill.statements.map((stmt) => (
