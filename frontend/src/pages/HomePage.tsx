@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
 import { FiTrendingUp, FiUsers, FiStar, FiArrowLeft } from 'react-icons/fi';
@@ -7,6 +8,7 @@ import ExplainerVideo from '../components/home/ExplainerVideo';
 import DemographicQuestionnaire from '../components/questionnaire/DemographicQuestionnaire';
 
 export default function HomePage() {
+  const [firstVideoFinished, setFirstVideoFinished] = useState(false);
   const { data: statsRes, isError: statsError } = useQuery({
     queryKey: ['bills', 'stats'],
     queryFn: () => api.getBillStats(),
@@ -84,7 +86,7 @@ export default function HomePage() {
             פלטפורמה שהופכת את החקיקה הישראלית לנגישה, שקופה ומשתפת
           </p>
         </div>
-        <WhatIsHukit />
+        <WhatIsHukit onComplete={() => setFirstVideoFinished(true)} />
       </section>
 
       {/* Legislation Simulator */}
@@ -97,7 +99,7 @@ export default function HomePage() {
             178 ימים, 8 שלבים, הצבעה אחת — צפו בתהליך החקיקה המלא
           </p>
         </div>
-        <ExplainerVideo />
+        <ExplainerVideo autoPlay={firstVideoFinished} />
       </section>
 
       {/* Demographic Questionnaire */}

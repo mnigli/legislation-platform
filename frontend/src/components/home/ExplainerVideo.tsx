@@ -320,9 +320,9 @@ function SceneRenderer({ scene }: { scene: SimStage['scene'] }) {
 
 // ==================== MAIN COMPONENT ====================
 
-export default function ExplainerVideo() {
+export default function ExplainerVideo({ autoPlay = true }: { autoPlay?: boolean }) {
   const [current, setCurrent] = useState(0);
-  const [playing, setPlaying] = useState(true);
+  const [playing, setPlaying] = useState(autoPlay);
   const [progress, setProgress] = useState(0);
 
   const goNext = useCallback(() => {
@@ -354,6 +354,13 @@ export default function ExplainerVideo() {
     }, 50);
     return () => clearInterval(interval);
   }, [playing, goNext]);
+
+  // Start playing when autoPlay becomes true
+  useEffect(() => {
+    if (autoPlay && !playing && current === 0 && progress === 0) {
+      setPlaying(true);
+    }
+  }, [autoPlay]);
 
   const stage = STAGES[current];
 

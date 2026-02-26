@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { FiPlay, FiPause, FiChevronLeft, FiChevronRight } from 'react-icons/fi';
 
 interface Slide {
@@ -70,15 +70,18 @@ const SLIDES: Slide[] = [
 
 const SLIDE_DURATION = 5000;
 
-export default function WhatIsHukit() {
+export default function WhatIsHukit({ onComplete }: { onComplete?: () => void }) {
   const [current, setCurrent] = useState(0);
   const [playing, setPlaying] = useState(true);
   const [progress, setProgress] = useState(0);
+  const onCompleteRef = useRef(onComplete);
+  onCompleteRef.current = onComplete;
 
   const goNext = useCallback(() => {
     setCurrent((prev) => {
       if (prev >= SLIDES.length - 1) {
         setPlaying(false);
+        onCompleteRef.current?.();
         return prev;
       }
       return prev + 1;
